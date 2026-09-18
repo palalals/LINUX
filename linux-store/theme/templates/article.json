@@ -1,4 +1,0 @@
-{
-  "sections": { "main": { "type": "main-article", "settings": {} }, "related": { "type": "product-carousel", "settings": { "number": "", "eyebrow": "Shop the drop", "heading": "Wear the story", "limit": 8 } } },
-  "order": ["main", "related"]
-}

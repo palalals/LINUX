@@ -1,5 +1,0 @@
-{%- assign number = settings.whatsapp_number | remove: '+' | remove: ' ' | remove: '-' -%}
-{%- capture prefill -%}{% render 'tr', value: settings.whatsapp_prefill, key: 'general.whatsapp_prefill' %}{%- endcapture -%}
-<a class="wa-fab glass glass--solid" href="https://wa.me/{{ number }}?text={{ prefill | strip | url_encode }}" target="_blank" rel="noopener" aria-label="WhatsApp">
-  {% render 'icon', name: 'whatsapp', px: 22 %}<span>{{ 'general.whatsapp' | t }}</span>
-</a>
