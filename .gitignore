@@ -1,7 +1,0 @@
-node_modules/
-.hoplite/attachments/
-.hoplite/artifacts/
-*.log
-.DS_Store
-linux-store/dev/.uploads/
-x.png
