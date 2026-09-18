@@ -1,0 +1,15 @@
+<section class="account wrap">
+  <div class="auth">
+    <div class="auth__panel glass">
+      <p class="eyebrow">{{ shop.name }}</p>
+      <h1>{{ 'customer.activate.title' | t }}</h1>
+      <p class="muted small">{{ 'customer.activate.body' | t }}</p>
+      {%- form 'activate_customer_password' -%}
+        {{ form.errors | default_errors }}
+        <label class="field"><span class="field__label">{{ 'customer.reset.password' | t }}</span><input class="input" type="password" name="customer[password]" autocomplete="new-password" required></label>
+        <label class="field"><span class="field__label">{{ 'customer.reset.confirm' | t }}</span><input class="input" type="password" name="customer[password_confirmation]" autocomplete="new-password" required></label>
+        <div style="display:flex;gap:8px"><button class="btn btn--primary btn--lg" type="submit">{{ 'customer.activate.submit' | t }}</button><button class="btn btn--ghost btn--lg" type="submit" name="decline">{{ 'customer.activate.decline' | t }}</button></div>
+      {%- endform -%}
+    </div>
+  </div>
+</section>

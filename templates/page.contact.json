@@ -1,0 +1,49 @@
+{
+  "sections": {
+    "main": {
+      "type": "contact",
+      "settings": {}
+    },
+    "faq": {
+      "type": "faq",
+      "blocks": {
+        "q1": {
+          "type": "question",
+          "settings": {
+            "key_q": "home.contact_faq_1_q",
+            "key_a": "home.contact_faq_1_a"
+          }
+        },
+        "q2": {
+          "type": "question",
+          "settings": {
+            "key_q": "home.contact_faq_2_q",
+            "key_a": "home.contact_faq_2_a"
+          }
+        },
+        "q3": {
+          "type": "question",
+          "settings": {
+            "key_q": "home.contact_faq_3_q",
+            "key_a": "home.contact_faq_3_a"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3"
+      ],
+      "settings": {
+        "open_first": true,
+        "key_eyebrow": "home.faq_eyebrow",
+        "key_heading": "home.contact_faq_title",
+        "key_body": "home.faq_body"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "faq"
+  ]
+}

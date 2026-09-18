@@ -1,0 +1,121 @@
+{
+  "sections": {
+    "story": {
+      "type": "about-story",
+      "blocks": {
+        "s1": {
+          "type": "stat",
+          "settings": {
+            "key_value": "home.about_stat_1_v",
+            "key_label": "home.about_stat_1_l"
+          }
+        },
+        "s2": {
+          "type": "stat",
+          "settings": {
+            "key_value": "home.about_stat_2_v",
+            "key_label": "home.about_stat_2_l"
+          }
+        },
+        "s3": {
+          "type": "stat",
+          "settings": {
+            "key_value": "home.about_stat_3_v",
+            "key_label": "home.about_stat_3_l"
+          }
+        },
+        "s4": {
+          "type": "stat",
+          "settings": {
+            "key_value": "home.about_stat_4_v",
+            "key_label": "home.about_stat_4_l"
+          }
+        },
+        "m1": {
+          "type": "moment",
+          "settings": {
+            "key_year": "home.about_moment_1_y",
+            "key_title": "home.about_moment_1_t",
+            "key_text": "home.about_moment_1_x"
+          }
+        },
+        "m2": {
+          "type": "moment",
+          "settings": {
+            "key_year": "home.about_moment_2_y",
+            "key_title": "home.about_moment_2_t",
+            "key_text": "home.about_moment_2_x"
+          }
+        },
+        "m3": {
+          "type": "moment",
+          "settings": {
+            "key_year": "home.about_moment_3_y",
+            "key_title": "home.about_moment_3_t",
+            "key_text": "home.about_moment_3_x"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "m1",
+        "m2",
+        "m3"
+      ],
+      "settings": {}
+    },
+    "statement": {
+      "type": "brand-statement",
+      "settings": {
+        "show_mascots": true,
+        "cta_url": "/collections/all",
+        "key_eyebrow": "home.about_why_eyebrow",
+        "key_heading": "home.about_why_heading_html",
+        "key_body": "home.about_why_body",
+        "key_cta": "home.customize_heading"
+      }
+    },
+    "ugc": {
+      "type": "instagram-feed",
+      "blocks": {
+        "u1": {
+          "type": "post"
+        },
+        "u2": {
+          "type": "post"
+        },
+        "u3": {
+          "type": "post"
+        },
+        "u4": {
+          "type": "post"
+        },
+        "u5": {
+          "type": "post"
+        },
+        "u6": {
+          "type": "post"
+        }
+      },
+      "block_order": [
+        "u1",
+        "u2",
+        "u3",
+        "u4",
+        "u5",
+        "u6"
+      ],
+      "settings": {
+        "handle": "@linux.eg"
+      }
+    }
+  },
+  "order": [
+    "story",
+    "statement",
+    "ugc"
+  ]
+}
