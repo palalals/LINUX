@@ -1,0 +1,207 @@
+{%- liquid
+  assign s = section.settings
+  assign menu = s.menu
+  if menu.links == blank
+    assign menu_handle = s.menu.handle | default: s.menu
+    assign menu = linklists[menu_handle]
+  endif
+-%}
+
+{%- if s.show_announcement -%}{%- capture announcement -%}{% render 'tr', value: s.announcement_text, key: 'home.announcement' %}{%- endcapture -%}
+<div class="announcement" role="region" aria-label="{{ 'sections.header.announcement' | t }}">
+  <div class="announcement__track" aria-hidden="true">
+    {%- for i in (1..6) -%}
+      <span class="announcement__item">{{ announcement }}<span class="announcement__dot"></span></span>
+    {%- endfor -%}
+  </div>
+  <span class="visually-hidden">{{ announcement }}</span>
+</div>
+{%- endif -%}
+
+<div class="header-zone" data-header-zone>
+  <header class="header glass" id="site-header" data-header role="banner">
+    <div class="header__inner">
+      <div class="header__start">
+        <button class="icon-btn header__menu" type="button" data-drawer-open="menu" aria-label="{{ 'sections.header.menu' | t }}" aria-expanded="false" aria-controls="menu-drawer">
+          {% render 'icon', name: 'menu' %}
+        </button>
+        <nav class="header__nav" aria-label="{{ 'sections.header.main_menu' | t }}">
+          {%- for link in menu.links -%}
+            {%- if link.links.size > 0 -%}
+              <div class="nav-item nav-item--mega" data-mega>
+                <a href="{% render 'nav-url', url: link.url, title: link.title %}" class="nav-link{% if link.active or link.child_active %} is-active{% endif %}" aria-haspopup="true" aria-expanded="false">
+                  {% render 'menu-title', title: link.title %}{% render 'icon', name: 'chevron-down', px: 14, class: 'nav-link__caret' %}
+                </a>
+                <div class="mega glass" role="menu">
+                  <div class="mega__cols">
+                    <div class="mega__col">
+                      {%- for child in link.links -%}
+                        <a href="{% render 'nav-url', url: child.url, title: child.title %}" class="mega__link{% if child.active %} is-active{% endif %}" role="menuitem">
+                          <span>{% render 'menu-title', title: child.title %}</span>{% render 'icon', name: 'arrow-right', px: 16 %}
+                        </a>
+                      {%- endfor -%}
+                    </div>
+                    {%- for block in section.blocks -%}
+                      {%- if block.type == 'mega_promo' and block.settings.menu_item == link.title -%}
+                        {%- assign promo_url = block.settings.link | default: link.url -%}
+                        <a href="{% render 'nav-url', url: promo_url %}" class="mega__promo media" {{ block.shopify_attributes }}>
+                          {%- if block.settings.image -%}
+                            <img src="{{ block.settings.image | image_url: width: 640 }}" alt="{{ block.settings.label | escape }}" width="320" height="200" loading="lazy">
+                          {%- else -%}
+                            <img src="{{ 'brand-campaign.webp' | asset_url }}" alt="" width="320" height="200" loading="lazy">
+                          {%- endif -%}
+                          <span class="mega__promo-label chip">{% render 'tr', value: block.settings.label, key: 'home.mega_promo' %}</span>
+                        </a>
+                      {%- endif -%}
+                    {%- endfor -%}
+                  </div>
+                </div>
+              </div>
+            {%- else -%}
+              <a href="{% render 'nav-url', url: link.url, title: link.title %}" class="nav-link{% if link.active %} is-active{% endif %}">{% render 'menu-title', title: link.title %}</a>
+            {%- endif -%}
+          {%- else -%}
+            <a href="{{ routes.root_url }}" class="nav-link">{{ 'nav.home' | t }}</a>
+            <a href="{{ routes.all_products_collection_url }}" class="nav-link">{{ 'nav.shop' | t }}</a>
+            <a href="{% render 'customize-url' %}" class="nav-link">{{ 'nav.menu.customize' | t }}</a>
+            <a href="/pages/contact" class="nav-link">{{ 'nav.menu.contact' | t }}</a>
+          {%- endfor -%}
+        </nav>
+      </div>
+
+      <a class="header__logo" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
+        {%- if s.logo != blank -%}
+          <img src="{{ s.logo | image_url: height: 88 }}" alt="{{ shop.name | escape }}" height="{{ s.logo_height | default: 24 }}" width="{{ s.logo.width | times: s.logo_height | divided_by: s.logo.height }}" loading="eager">
+        {%- else -%}
+          {% render 'brand-logo', class: 'header__logo-mark', height: s.logo_height %}
+        {%- endif -%}
+      </a>
+
+      <div class="header__end">
+        {%- if localization.available_languages.size > 1 -%}
+          {%- form 'localization', id: 'HeaderLanguageForm', class: 'header__locale-form' -%}
+            <div class="header__locale" style="position: relative;">
+              <button type="button" class="icon-btn" aria-label="{{ 'general.english' | t }} / {{ 'general.arabic' | t }}" onclick="this.nextElementSibling.toggleAttribute('hidden')">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+              </button>
+              <div class="header__locale-dropdown glass" hidden style="position:absolute;top:calc(100% + 8px);inset-inline-end:0;padding:8px;border-radius:var(--r-md);display:flex;flex-direction:column;gap:4px;z-index:10;min-width:110px;">
+                {%- for language in localization.available_languages -%}
+                  <button type="submit" name="locale_code" value="{{ language.iso_code }}" class="btn btn--sm {% if language.iso_code == localization.language.iso_code %}btn--primary{% else %}btn--ghost{% endif %}">{{ language.endonym_name }}</button>
+                {%- endfor -%}
+              </div>
+            </div>
+          {%- endform -%}
+        {%- endif -%}
+        <button class="icon-btn" type="button" data-drawer-open="search" aria-label="{{ 'search.title' | t }}" aria-expanded="false">
+          {% render 'icon', name: 'search' %}
+        </button>
+        {%- if settings.show_wishlist != false -%}
+        <a class="icon-btn header__wishlist" href="/pages/wishlist" data-wishlist-link aria-label="{{ 'wishlist.title' | t }}">
+          {% render 'icon', name: 'heart' %}<span class="badge header__count" data-wishlist-count hidden>0</span>
+        </a>
+        {%- endif -%}
+        {%- if settings.cart_type == 'page' -%}
+          <a class="icon-btn header__cart" href="{{ routes.cart_url }}" aria-label="{{ 'cart.title' | t }}">
+        {%- else -%}
+          <button class="icon-btn header__cart" type="button" data-drawer-open="cart" aria-label="{{ 'cart.title' | t }}" aria-expanded="false">
+        {%- endif -%}
+          {% render 'icon', name: 'bag' %}
+          <span class="badge header__count" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
+        {%- if settings.cart_type == 'page' -%}</a>{%- else -%}</button>{%- endif -%}
+        {%- if s.show_shop_cta -%}
+          {%- assign shop_cta_url = s.shop_cta_url | default: routes.all_products_collection_url -%}
+          <a href="{% render 'nav-url', url: shop_cta_url %}" class="btn btn--primary btn--sm header__cta">{% render 'tr', value: s.shop_cta_label, key: 'home.shop_cta' %}</a>
+        {%- endif -%}
+      </div>
+    </div>
+  </header>
+</div>
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "section-header",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo (leave empty for the built-in LINUX wordmark)"
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "label": "Logo height",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_shop_cta",
+      "label": "Show Shop button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "shop_cta_label",
+      "label": "Shop button label (blank = translated)"
+    },
+    {
+      "type": "url",
+      "id": "shop_cta_url",
+      "label": "Shop button link"
+    },
+    {
+      "type": "header",
+      "content": "Announcement"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_announcement",
+      "label": "Show announcement bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "announcement_text",
+      "label": "Text (blank = translated)"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "mega_promo",
+      "name": "Mega menu promo",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item",
+          "label": "Menu item title (must match)"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

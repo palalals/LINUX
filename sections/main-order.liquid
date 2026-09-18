@@ -1,0 +1,127 @@
+{%- comment -%}
+  Order page — doubles as the "thank you" view a customer lands on from the
+  account. Progress track (placed → paid → stitched → delivered), the pieces
+  with their custom mockups, totals, addresses, and help.
+{%- endcomment -%}
+{%- liquid
+  capture placed_date
+    render 'date-ar', date: order.created_at
+  endcapture
+  assign placed_date = placed_date | strip
+  assign step = 1
+  if order.financial_status == 'paid' or order.financial_status == 'partially_paid' or order.financial_status == 'authorized'
+    assign step = 2
+  endif
+  if order.fulfillment_status == 'partial' or order.fulfillment_status == 'in_progress'
+    assign step = 3
+  endif
+  if order.fulfillment_status == 'fulfilled'
+    assign step = 4
+  endif
+  if order.cancelled
+    assign step = 0
+  endif
+-%}
+<section class="account wrap order">
+  <div class="order__hero glass" data-specular data-reveal>
+    <div class="order__hero-copy">
+      <a href="{{ routes.account_url }}" class="order__back">{% render 'icon', name: 'arrow-left', px: 14 %}{{ 'customer.order.back' | t }}</a>
+      <p class="eyebrow">{{ 'customer.order.thanks_eyebrow' | t }}</p>
+      <h1>{{ 'customer.order.thanks_title' | t: name: order.name }}</h1>
+      <p class="lede">{{ 'customer.order.thanks_body' | t: date: placed_date }}</p>
+    </div>
+    <div class="order__hero-mascot" aria-hidden="true">{% render 'mascot', name: 'boombox', width: 150, loading: 'eager' %}</div>
+  </div>
+
+  <ol class="order__track glass" data-reveal style="--i:1" aria-label="{{ 'customer.order.progress' | t }}">
+    {%- assign labels = 'placed,paid,stitched,delivered' | split: ',' -%}
+    {%- for l in labels -%}
+      {%- assign n = forloop.index -%}
+      {%- assign key = 'customer.order.step_' | append: l -%}
+      <li class="order__step{% if n < step or n == step %} is-done{% endif %}{% if n == step %} is-current{% endif %}">
+        <span class="order__step-dot">{%- if n < step -%}{% render 'icon', name: 'check', px: 14 %}{%- elsif n == step -%}<span class="dot"></span>{%- else -%}{{ n }}{%- endif -%}</span>
+        <span class="order__step-label">{{ key | t }}</span>
+      </li>
+    {%- endfor -%}
+  </ol>
+
+  <div class="account__grid order__grid">
+    <div class="account__main">
+      <div class="account__panel glass" data-reveal style="--i:2">
+        <div class="account__panel-head"><h2 class="h3">{{ 'customer.order.items' | t }}</h2>{%- assign oc = 0 -%}{%- for li in order.line_items -%}{%- assign oc = oc | plus: li.quantity -%}{%- endfor -%}<span class="chip">{{ 'cart.item_count' | t: count: oc }}</span></div>
+        <ul class="cart-lines" role="list">
+          {%- for item in order.line_items -%}
+            {%- liquid
+              assign mock = ''
+              for p in item.properties
+                if p.first == 'Back mockup' or p.first == 'Front mockup'
+                  if p.last contains '/uploads/'
+                    assign mock = p.last
+                  endif
+                endif
+              endfor
+            -%}
+            <li class="cart-line glass glass--clear">
+              <a class="cart-line__media{% if mock != '' %} cart-line__media--mockup{% endif %}" href="{{ item.url }}">
+                {%- if mock != '' -%}<img src="{{ mock }}" alt="" width="84" height="84" loading="lazy">
+                {%- elsif item.image -%}<img src="{{ item.image | image_url: width: 200 }}" alt="" width="84" height="104" loading="lazy">{%- endif -%}
+              </a>
+              <div class="cart-line__body">
+                <strong class="cart-line__title">{% render 'product-title', title: item.title %}</strong>
+                {%- if item.variant_title -%}<p class="cart-line__meta">{{ item.variant_title }}</p>{%- endif -%}
+                {%- if item.properties['Bundle offer'] != blank -%}
+                  <div class="cart-line__bundle">
+                    <span class="cart-line__bundle-icon">{% render 'icon', name: 'tag', px: 14 %}</span>
+                    <span><strong>{% if request.locale.iso_code contains 'ar' %}عرض الباندل{% else %}Bundle offer{% endif %}</strong><small>{{ item.properties['Bundle offer'] | escape }}</small>{%- if item.properties['Expected bundle discount'] != blank -%}<small class="muted">{% render 'property-label', name: 'Expected bundle discount' %}: {{ item.properties['Expected bundle discount'] | escape }}</small>{%- endif -%}</span>
+                  </div>
+                {%- endif -%}
+                {%- assign prop_count = 0 -%}
+                {%- for p in item.properties -%}{%- assign fc = p.first | slice: 0 -%}{%- if p.last != blank and fc != '_' -%}{%- assign prop_count = prop_count | plus: 1 -%}{%- endif -%}{%- endfor -%}
+                {%- if prop_count > 0 -%}
+                  <details class="cart-line__props"><summary>{{ 'cart.details' | t }} · {{ prop_count }}</summary>
+                    {%- for p in item.properties -%}{%- assign fc = p.first | slice: 0 -%}
+                      {%- if p.last != blank and fc != '_' -%}
+                        <p class="cart-line__meta">{% render 'property-label', name: p.first %}: {%- if p.last contains '/uploads/' -%} <a href="{{ p.last }}" target="_blank" rel="noopener">{{ 'cart.view_file' | t }}</a>{%- else -%} {{ p.last }}{%- endif -%}</p>
+                      {%- endif -%}
+                    {%- endfor -%}
+                  </details>
+                {%- endif -%}
+                <div class="cart-line__row"><span class="muted small">× {{ item.quantity }}</span><span class="cart-line__price">{% render 'money', amount: item.final_line_price %}</span></div>
+              </div>
+            </li>
+          {%- endfor -%}
+        </ul>
+        <div class="cart-totals" style="margin-top:14px">
+          <div class="cart-totals__row"><span>{{ 'customer.order.subtotal' | t }}</span><span>{% render 'money', amount: order.subtotal_price %}</span></div>
+          <div class="cart-totals__row"><span>{{ 'customer.order.shipping' | t }}</span><span>{%- if order.shipping_price > 0 -%}{% render 'money', amount: order.shipping_price %}{%- else -%}{{ 'customer.order.free' | t }}{%- endif -%}</span></div>
+          {%- if order.total_discounts > 0 -%}<div class="cart-totals__row"><span>{{ 'customer.order.discount' | t }}</span><span>−{% render 'money', amount: order.total_discounts %}</span></div>{%- endif -%}
+          <div class="cart-totals__row cart-totals__row--total"><span>{{ 'customer.order.total' | t }}</span><span class="money">{% render 'money', amount: order.total_price %}</span></div>
+        </div>
+      </div>
+    </div>
+    <aside class="order__side">
+      <div class="account__panel glass" data-reveal style="--i:3">
+        <div class="account__panel-head"><h2 class="h3">{% render 'icon', name: 'truck', px: 16 %} {{ 'customer.order.shipping_address' | t }}</h2></div>
+        <div class="address-card__text">{{ order.shipping_address | format_address }}</div>
+        {%- if order.shipping_methods.size > 0 -%}<p class="muted small">{{ order.shipping_methods.first.title }}</p>{%- endif -%}
+      </div>
+      <div class="account__panel glass" data-reveal style="--i:4">
+        <div class="account__panel-head"><h2 class="h3">{% render 'icon', name: 'lock', px: 16 %} {{ 'customer.order.payment' | t }}</h2></div>
+        <p class="small">{% render 'order-status', status: order.financial_status, label: order.financial_status_label %}</p>
+        <div class="address-card__text muted small">{{ order.billing_address | format_address }}</div>
+      </div>
+      <div class="account__panel glass account__help" data-reveal style="--i:5">
+        <div class="account__panel-head"><h2 class="h3">{{ 'customer.order.help_title' | t }}</h2></div>
+        <p class="muted small">{{ 'customer.order.help_body' | t }}</p>
+        {%- if settings.whatsapp_number != blank -%}
+          {%- assign wa_text = 'customer.order.help_prefill' | t: name: order.name -%}
+          <a class="btn btn--glass btn--sm" href="https://wa.me/{{ settings.whatsapp_number | remove: '+' | remove: ' ' }}?text={{ wa_text | url_encode }}" target="_blank" rel="noopener">{% render 'icon', name: 'whatsapp', px: 16 %}{{ 'general.whatsapp' | t }}</a>
+        {%- endif -%}
+        <a class="btn btn--primary btn--sm" href="{{ routes.all_products_collection_url }}">{{ 'customer.order.shop_again' | t }}{% render 'icon', name: 'arrow-right', px: 14 %}</a>
+      </div>
+    </aside>
+  </div>
+</section>
+{% schema %}
+{ "name": "Order", "settings": [] }
+{% endschema %}

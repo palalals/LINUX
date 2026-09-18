@@ -1,0 +1,78 @@
+{%- liquid
+  assign s = section.settings
+  assign coll = s.collection
+  if coll == blank
+    assign coll = collections.all
+  endif
+-%}
+<section class="section wrap" id="s-{{ section.id }}">
+  <div class="section-head">
+    <div class="section-head__text" data-reveal>
+      <p class="eyebrow">{% if s.number != blank %}<span class="eyebrow__num">{{ s.number }}</span>{% endif %}{% render 'tr', value: s.eyebrow, key: 'home.arrivals_eyebrow' %}</p>
+      <h2>{% render 'tr', value: s.heading, key: 'home.arrivals_heading' %}</h2>
+      {%- if s.body != blank -%}<p class="lede" style="margin-top:12px">{{ s.body }}</p>{%- endif -%}
+    </div>
+    <a href="{{ coll.url }}" class="btn btn--ghost btn--sm" data-reveal>{{ 'general.view_all' | t }}{% render 'icon', name: 'arrow-right', px: 16 %}</a>
+  </div>
+  <div class="product-grid" style="--cols: {{ s.columns | default: 4 }}">
+    {%- for product in coll.products limit: s.limit -%}
+      {% render 'product-card', product: product, collection: coll, index: forloop.index0 %}
+    {%- endfor -%}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "Product grid",
+  "settings": [
+    {
+      "type": "text",
+      "id": "number",
+      "label": "Section number",
+      "default": "03"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow (blank = translated)"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading (blank = translated)"
+    },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "Text (blank = translated)"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "label": "Products",
+      "min": 4,
+      "max": 16,
+      "step": 4,
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns (desktop)",
+      "min": 3,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product grid"
+    }
+  ]
+}
+{% endschema %}

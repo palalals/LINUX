@@ -1,0 +1,104 @@
+{%- comment -%}
+  Customer dashboard — greeting card with quick stats, order list with status
+  pills and product thumbnails, saved items, default address, help card.
+{%- endcomment -%}
+{%- liquid
+  assign first = customer.first_name | default: customer.name
+-%}
+<section class="account wrap" data-account>
+  <div class="account__hero glass" data-specular data-reveal>
+    <div class="account__hero-copy">
+      <p class="eyebrow">{{ 'customer.account.title' | t }}</p>
+      <h1>{{ 'customer.account.welcome' | t: name: first }}</h1>
+      <p class="lede">{{ 'customer.account.intro' | t }}</p>
+    </div>
+    <ul class="account__stats" role="list">
+      <li class="glass glass--clear"><strong data-count>{{ customer.orders_count }}</strong><span>{{ 'customer.account.stat_orders' | t }}</span></li>
+      <li class="glass glass--clear"><strong>{%- assign spent = customer.total_spent | default: 0 -%}{% render 'money', amount: spent %}</strong><span>{{ 'customer.account.stat_spent' | t }}</span></li>
+      <li class="glass glass--clear"><strong data-wishlist-count-big>0</strong><span>{{ 'customer.account.stat_saved' | t }}</span></li>
+    </ul>
+    <div class="account__hero-mascot" aria-hidden="true">{% render 'mascot', name: 'hoodie-sit', width: 150, loading: 'eager' %}</div>
+  </div>
+
+  <div class="account__grid">
+    {% render 'account-nav', active: 'orders' %}
+    <div class="account__main">
+      <div class="account__panel glass" data-reveal>
+        <div class="account__panel-head">
+          <h2 class="h3">{{ 'customer.account.orders' | t }}</h2>
+          {%- if customer.orders.size > 0 -%}<span class="chip">{{ 'customer.account.orders_count' | t: count: customer.orders_count }}</span>{%- endif -%}
+        </div>
+        {%- paginate customer.orders by 10 -%}
+          {%- if customer.orders.size > 0 -%}
+            <div class="orders" role="list">
+              {%- for order in customer.orders -%}
+                <a href="{{ order.customer_url }}" class="order-card glass glass--clear glass--hover" role="listitem">
+                  <div class="order-card__thumbs" aria-hidden="true">
+                    {%- for item in order.line_items limit: 3 -%}
+                      {%- if item.image -%}<img src="{{ item.image | image_url: width: 120 }}" alt="" width="48" height="60" loading="lazy">{%- endif -%}
+                    {%- endfor -%}
+                    {%- if order.line_items.size > 3 -%}<span class="order-card__more">+{{ order.line_items.size | minus: 3 }}</span>{%- endif -%}
+                  </div>
+                  <div class="order-card__body">
+                    <div class="order-card__top">
+                      <strong>{{ order.name }}</strong>
+                      <span class="order-card__date">{% render 'date-ar', date: order.created_at %}</span>
+                    </div>
+                    <div class="order-card__status">
+                      {% render 'order-status', status: order.financial_status, label: order.financial_status_label, icon: 'check' %}
+                      {% render 'order-status', status: order.fulfillment_status, label: order.fulfillment_status_label, icon: 'truck' %}
+                    </div>
+                  </div>
+                  <div class="order-card__end">
+                    <strong class="order-card__total">{% render 'money', amount: order.total_price %}</strong>
+                    <span class="order-card__cta">{{ 'customer.orders.view' | t }}{% render 'icon', name: 'arrow-right', px: 14 %}</span>
+                  </div>
+                </a>
+              {%- endfor -%}
+            </div>
+            {%- if paginate.pages > 1 -%}<nav class="pagination">{{ paginate | default_pagination }}</nav>{%- endif -%}
+          {%- else -%}
+            <div class="empty-state account__empty">
+              {% render 'mascot', name: 'classic', width: 110 %}
+              <h3>{{ 'customer.account.no_orders' | t }}</h3>
+              <p class="muted">{{ 'customer.account.no_orders_body' | t }}</p>
+              <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary btn--sm">{{ 'cart.start_shopping' | t }}</a>
+            </div>
+          {%- endif -%}
+        {%- endpaginate -%}
+      </div>
+
+      <div class="account__two">
+        <div class="account__panel glass" data-reveal style="--i:1">
+          <div class="account__panel-head"><h2 class="h3">{{ 'customer.account.details' | t }}</h2></div>
+          <div class="account__detail">
+            <span class="account__avatar" aria-hidden="true">{{ first | slice: 0 | upcase }}</span>
+            <div><strong>{{ customer.name }}</strong><br><span class="muted small">{{ customer.email }}</span>{%- if customer.phone -%}<br><span class="muted small">{{ customer.phone }}</span>{%- endif -%}</div>
+          </div>
+          {%- if customer.default_address -%}
+            <div class="address-card glass glass--clear">
+              <strong class="small">{% render 'icon', name: 'pin', px: 14 %} {{ 'customer.account.default_address' | t }}</strong>
+              <div class="address-card__text">{{ customer.default_address | format_address }}</div>
+            </div>
+          {%- endif -%}
+          <a href="{{ routes.account_addresses_url }}" class="btn btn--ghost btn--sm" style="justify-self:start">{{ 'customer.account.view_addresses' | t }}</a>
+        </div>
+
+        <div class="account__panel glass account__help" data-reveal style="--i:2">
+          <div class="account__panel-head"><h2 class="h3">{{ 'customer.account.help_title' | t }}</h2></div>
+          <p class="muted small">{{ 'customer.account.help_body' | t }}</p>
+          <div class="account__help-links">
+            {%- if settings.whatsapp_number != blank -%}
+              <a class="btn btn--glass btn--sm" href="https://wa.me/{{ settings.whatsapp_number | remove: '+' | remove: ' ' }}?text={{ 'customer.account.help_prefill' | t | url_encode }}" target="_blank" rel="noopener">{% render 'icon', name: 'whatsapp', px: 16 %}{{ 'general.whatsapp' | t }}</a>
+            {%- endif -%}
+            <a class="btn btn--ghost btn--sm" href="{{ pages['faq'].url | default: pages['contact'].url | default: routes.root_url }}">{% render 'icon', name: 'info', px: 16 %}{{ 'nav.menu.faq' | t }}</a>
+            <a class="btn btn--ghost btn--sm" href="{{ pages['customize'].url | default: routes.all_products_collection_url }}">{% render 'icon', name: 'palette', px: 16 %}{{ 'nav.menu.customize' | t }}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% schema %}
+{ "name": "Account", "settings": [] }
+{% endschema %}

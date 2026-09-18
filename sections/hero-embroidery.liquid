@@ -1,0 +1,110 @@
+{%- comment -%}
+  Hero — the LINUX wordmark being embroidered, shot macro. The video IS the
+  hero and nothing sits on it: full-bleed footage edge to edge, no controls,
+  no overlays. The glass panel with the headline, CTAs and trust row lives in
+  the band directly under the video, so it slides into view as you scroll —
+  the merchant can switch the layout back to "over the video" in the editor.
+  The video ships with the theme (1080p + 720p + poster); swap it in the editor.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign poster = 'hero-embroidery-poster-v2.png' | asset_url
+  if s.poster != blank
+    assign poster = s.poster | image_url: width: 1920
+  endif
+  assign heading = s.heading
+  if heading == blank
+    assign heading = 'sections.hero.heading' | t
+  endif
+  assign sub = s.subheading
+  if sub == blank
+    assign sub = 'sections.hero.subheading' | t
+  endif
+  assign cta = s.cta_label
+  if cta == blank
+    assign cta = 'sections.hero.cta' | t
+  endif
+  assign cta2 = s.cta2_label
+  if cta2 == blank
+    assign cta2 = 'sections.hero.cta2' | t
+  endif
+  assign eyebrow = s.eyebrow
+  if eyebrow == blank
+    assign eyebrow = 'sections.hero.eyebrow' | t
+  endif
+  assign layout = s.layout | default: 'below'
+  assign panel_below = true
+  if layout == 'over'
+    assign panel_below = false
+  endif
+  assign show_panel = true
+  if s.show_headline == false and s.show_cta == false
+    assign show_panel = false
+  endif
+-%}
+<section class="hero hero--wide{% if panel_below %} hero--panel-below{% else %} hero--panel-over{% endif %}{% unless show_panel %} hero--quiet{% endunless %}" id="hero-{{ section.id }}" style="--hero-h: {{ s.height | default: 100 }}svh; --hero-h-mobile: {{ s.height_mobile | default: 100 }}svh; --hero-dim: {{ s.overlay | default: 0 | divided_by: 100.0 }};" data-hero>
+  <div class="hero__stage">
+    <div class="hero__media" aria-hidden="true" data-hero-media>
+      {%- if s.video != blank -%}
+        {{ s.video | video_tag: autoplay: true, loop: true, muted: true, controls: false, playsinline: true, preload: 'metadata', class: 'hero__video', poster: poster }}
+      {%- else -%}
+        {%- comment -%} Three cuts of the same loop: 1080p desktop (~1 MB), 720p tablet, 540×960 portrait crop for phones (~220 KB). {%- endcomment -%}
+        <video class="hero__video" autoplay muted loop playsinline preload="auto" poster="{{ poster }}" data-hero-video>
+          <source src="{{ 'hero-1080.mp4' | asset_url }}" type="video/mp4" media="(min-width: 1100px)">
+          <source src="{{ 'hero-720.mp4' | asset_url }}" type="video/mp4" media="(min-width: 640px)">
+          <source src="{{ 'hero-mobile.mp4' | asset_url }}" type="video/mp4">
+        </video>
+      {%- endif -%}
+      <div class="hero__scrim"></div>
+      <div class="hero__vignette"></div>
+    </div>
+
+
+
+    {%- unless panel_below -%}
+      {%- if show_panel -%}
+        <div class="hero__inner wrap">{% render 'hero-panel', s: s, eyebrow: eyebrow, heading: heading, sub: sub, cta: cta, cta2: cta2 %}</div>
+      {%- endif -%}
+    {%- endunless -%}
+  </div>
+
+  {%- if panel_below and show_panel -%}
+    <div class="hero__band wrap" id="hero-panel-{{ section.id }}">{% render 'hero-panel', s: s, eyebrow: eyebrow, heading: heading, sub: sub, cta: cta, cta2: cta2 %}</div>
+  {%- endif -%}
+</section>
+<div id="after-hero"></div>
+
+{% schema %}
+{
+  "name": "Hero — Embroidery video",
+  "settings": [
+    { "type": "paragraph", "content": "Text fields left empty fall back to the theme's translations, so the hero switches language automatically." },
+    { "type": "header", "content": "Video" },
+    { "type": "video", "id": "video", "label": "Video (defaults to the embroidery loop shipped with the theme)" },
+    { "type": "image_picker", "id": "poster", "label": "Poster image" },
+    { "type": "range", "id": "height", "label": "Video height (desktop)", "min": 50, "max": 100, "step": 5, "unit": "vh", "default": 100 },
+    { "type": "range", "id": "height_mobile", "label": "Video height (phone)", "min": 40, "max": 100, "step": 5, "unit": "vh", "default": 100 },
+    { "type": "range", "id": "overlay", "label": "Darken video", "min": 0, "max": 60, "step": 5, "unit": "%", "default": 0 },
+    { "type": "header", "content": "Glass panel" },
+    { "type": "select", "id": "layout", "label": "Where the glass panel sits", "options": [
+      { "value": "below", "label": "Under the video (video stays clean)" },
+      { "value": "over", "label": "Over the video" }
+    ], "default": "below" },
+    { "type": "checkbox", "id": "show_headline", "label": "Show headline", "default": true },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+    { "type": "text", "id": "heading", "label": "Headline" },
+    { "type": "textarea", "id": "subheading", "label": "Subheading" },
+    { "type": "checkbox", "id": "show_cta", "label": "Show buttons", "default": true },
+    { "type": "text", "id": "cta_label", "label": "Primary button" },
+    { "type": "url", "id": "cta_url", "label": "Primary link" },
+    { "type": "text", "id": "cta2_label", "label": "Secondary button" },
+    { "type": "url", "id": "cta2_url", "label": "Secondary link" },
+    { "type": "header", "content": "Trust row" },
+    { "type": "checkbox", "id": "show_trust", "label": "Show trust row", "default": true },
+    { "type": "text", "id": "trust_1", "label": "Trust 1" },
+    { "type": "text", "id": "trust_2", "label": "Trust 2" },
+    { "type": "text", "id": "trust_3", "label": "Trust 3" }
+  ],
+  "presets": [ { "name": "Hero — Embroidery video" } ]
+}
+{% endschema %}

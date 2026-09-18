@@ -1,0 +1,46 @@
+{%- comment -%}
+  Cart page = the review step before Shopify's hosted checkout. Two columns:
+  the pieces (editable) and a sticky order summary with delivery estimate,
+  payment methods, discount, note and the checkout button. Shopify's own
+  checkout can't be themed with Liquid; INSTALL.md carries the matching
+  brand settings for the Checkout & accounts editor.
+{%- endcomment -%}
+{%- liquid
+  assign steps = 'bag,details,payment' | split: ','
+-%}
+<section class="cart-page wrap" id="cart-{{ section.id }}">
+  <header class="cart-page__head" data-reveal>
+    <div>
+      <p class="eyebrow">{{ 'cart.review_eyebrow' | t }}</p>
+      <h1>{{ 'cart.title' | t }} <span class="cart-page__count" data-cart-count>{{ cart.item_count }}</span></h1>
+    </div>
+    <ol class="checkout-steps glass glass--pill" aria-label="{{ 'cart.steps_label' | t }}">
+      {%- for st in steps -%}
+        {%- assign key = 'cart.step_' | append: st -%}
+        <li class="checkout-steps__item{% if forloop.first %} is-current{% endif %}"><span class="checkout-steps__n">{{ forloop.index }}</span>{{ key | t }}</li>
+      {%- endfor -%}
+    </ol>
+  </header>
+
+  <div class="cart-page__grid" data-cart-page data-section-id="{{ section.id }}">
+    <div class="glass cart-page__lines" data-cart-region="body">
+      {% render 'cart-body', cart: cart, context: 'page' %}
+    </div>
+    <aside class="glass cart-page__summary" data-cart-region="foot">
+      <h2 class="h3 cart-page__summary-title">{{ 'cart.summary' | t }}</h2>
+      {% render 'cart-foot', cart: cart, context: 'page' %}
+      {%- if cart.item_count > 0 -%}
+        <ul class="cart-page__trust" role="list">
+          {%- if settings.show_delivery_estimate -%}<li>{% render 'icon', name: 'truck', px: 16 %}<span>{{ 'products.delivery_cairo' | t }} {% render 'delivery-eta', value: settings.delivery_cairo %} · {{ 'products.delivery_egypt' | t }} {% render 'delivery-eta', value: settings.delivery_egypt %}</span></li>{%- endif -%}
+          <li>{% render 'icon', name: 'lock', px: 16 %}<span>{{ 'cart.trust_secure' | t }}</span></li>
+          <li>{% render 'icon', name: 'return', px: 16 %}<span>{{ 'cart.trust_exchange' | t }}</span></li>
+          <li>{% render 'icon', name: 'shield', px: 16 %}<span>{{ 'cart.trust_cod' | t }}</span></li>
+        </ul>
+        <a href="{{ routes.all_products_collection_url }}" class="btn btn--ghost btn--sm btn--block">{{ 'cart.continue' | t }}</a>
+      {%- endif -%}
+    </aside>
+  </div>
+</section>
+{% schema %}
+{ "name": "Cart", "settings": [] }
+{% endschema %}

@@ -1,0 +1,13 @@
+<section class="section wrap" id="s-{{ section.id }}" aria-hidden="true">
+  <div class="penguins">
+    {% render 'mascot', name: 'classic', width: 120 %}
+    {% render 'mascot', name: 'skate', width: 120 %}
+    {% render 'mascot', name: 'hoodie-sit', width: 120 %}
+    {% render 'mascot', name: 'boombox', width: 120 %}
+    {% render 'mascot', name: 'skate-spray', width: 120 %}
+    {% render 'mascot', name: 'classic', width: 120 %}
+  </div>
+</section>
+{% schema %}
+{ "name": "Penguin row", "settings": [], "presets": [ { "name": "Penguin row" } ] }
+{% endschema %}

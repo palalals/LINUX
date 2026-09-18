@@ -1,0 +1,57 @@
+{%- if section.blocks.size > 0 -%}
+<div class="marquee" aria-hidden="true">
+  <div class="marquee__track">
+    {%- for i in (1..3) -%}
+      {%- for block in section.blocks -%}
+        <span class="marquee__item" {{ block.shopify_attributes }}>
+          {% render 'tr', value: block.settings.text, key: block.settings.key %}
+          {%- if block.settings.code != blank -%}
+            <button class="marquee__code" type="button" data-copy="{{ block.settings.code | escape }}" onclick="navigator.clipboard.writeText(this.dataset.copy);this.querySelector('.marquee__code-label').textContent='✓';setTimeout(()=>this.querySelector('.marquee__code-label').textContent=this.dataset.copy,2000)">{% render 'icon', name: 'tag', px: 12 %}<span class="marquee__code-label">{{ block.settings.code }}</span></button>
+          {%- endif -%}
+          {% render 'icon', name: 'sparkle', px: 16 %}
+        </span>
+      {%- endfor -%}
+    {%- endfor -%}
+  </div>
+</div>
+{%- endif -%}
+{% schema %}
+{
+  "name": "Marquee",
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "text",
+          "id": "key",
+          "label": "Translation key (e.g. home.marquee_1)"
+        },
+        {
+          "type": "text",
+          "id": "code",
+          "label": "Discount code (click to copy)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marquee",
+      "blocks": [
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" }
+      ]
+    }
+  ]
+}
+{% endschema %}

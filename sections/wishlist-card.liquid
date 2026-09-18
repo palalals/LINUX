@@ -1,0 +1,10 @@
+{%- comment -%}
+  Static helper section: /products/<handle>?section_id=wishlist-card returns the
+  standard product card for the saved-items page (wishlist.js).
+{%- endcomment -%}
+{%- if product -%}
+  {% render 'product-card', product: product, lazy: true %}
+{%- endif -%}
+{% schema %}
+{ "name": "Wishlist card (helper)", "settings": [] }
+{% endschema %}

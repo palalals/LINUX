@@ -1,0 +1,29 @@
+<section class="account wrap">
+  <div class="auth">
+    <div class="auth__mascot" data-reveal>{% render 'mascot', name: 'skate', width: 120 %}</div>
+    <div class="auth__panel glass" data-reveal style="--i:1">
+      <p class="eyebrow">{{ shop.name }}</p>
+      <h1>{{ 'customer.register.title' | t }}</h1>
+      <ul class="auth__perks">
+        <li>{% render 'icon', name: 'check', px: 14 %}{{ 'customer.register.perk_1' | t }}</li>
+        <li>{% render 'icon', name: 'check', px: 14 %}{{ 'customer.register.perk_2' | t }}</li>
+        <li>{% render 'icon', name: 'check', px: 14 %}{{ 'customer.register.perk_3' | t }}</li>
+      </ul>
+      {%- form 'create_customer', novalidate: 'novalidate' -%}
+        {{ form.errors | default_errors }}
+        <div class="contact__row">
+          <label class="field"><span class="field__label">{{ 'customer.register.first_name' | t }}</span><input class="input" type="text" name="customer[first_name]" autocomplete="given-name"></label>
+          <label class="field"><span class="field__label">{{ 'customer.register.last_name' | t }}</span><input class="input" type="text" name="customer[last_name]" autocomplete="family-name"></label>
+        </div>
+        <label class="field"><span class="field__label">{{ 'customer.register.email' | t }}</span><input class="input" type="email" name="customer[email]" autocomplete="email" required></label>
+        <label class="field"><span class="field__label">{{ 'customer.register.password' | t }}</span><input class="input" type="password" name="customer[password]" autocomplete="new-password" required></label>
+        <label class="checkbox"><input type="checkbox" name="customer[accepts_marketing]" checked> {{ 'newsletter.footer_label' | t }}</label>
+        <button class="btn btn--primary btn--lg btn--block" type="submit">{{ 'customer.register.submit' | t }}</button>
+        <p class="small muted" style="text-align:center">{{ 'customer.register.have_account' | t }} <a class="link" href="{{ routes.account_login_url }}">{{ 'customer.register.sign_in' | t }}</a></p>
+      {%- endform -%}
+    </div>
+  </div>
+</section>
+{% schema %}
+{ "name": "Register", "settings": [] }
+{% endschema %}

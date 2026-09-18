@@ -1,0 +1,54 @@
+<section class="account wrap">
+  <header class="cart-page__head" data-reveal>
+    <p class="eyebrow">{{ 'customer.account.title' | t }}</p>
+    <h1>{{ 'customer.addresses.title' | t }}</h1>
+  </header>
+  <div class="account__grid">
+    {% render 'account-nav', active: 'addresses' %}
+    <div class="account__main">
+      <div class="account__panel glass" data-reveal>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+          <h2 class="h3">{{ 'customer.addresses.title' | t }}</h2>
+          <button class="btn btn--primary btn--sm" type="button" data-address-toggle="new">{% render 'icon', name: 'plus', px: 16 %}{{ 'customer.addresses.add' | t }}</button>
+        </div>
+        <div class="address-form-wrap" data-address-form="new" hidden>
+          {%- form 'customer_address', customer.new_address, class: 'address-form' -%}
+            {% render 'address-fields', form: form %}
+            <div style="display:flex;gap:8px"><button class="btn btn--primary" type="submit">{{ 'customer.addresses.save' | t }}</button><button class="btn btn--ghost" type="button" data-address-toggle="new">{{ 'customer.addresses.cancel' | t }}</button></div>
+          {%- endform -%}
+        </div>
+        {%- if customer.addresses.size > 0 -%}
+          <div class="contact__row">
+            {%- for address in customer.addresses -%}
+              <div class="address-card glass glass--clear">
+                {%- if address == customer.default_address -%}<span class="status status--paid">{{ 'customer.addresses.default' | t }}</span>{%- endif -%}
+                {{ address | format_address }}
+                <div class="address-card__actions">
+                  <button class="btn btn--ghost btn--sm" type="button" data-address-toggle="{{ address.id }}">{{ 'customer.addresses.edit' | t }}</button>
+                  <form method="post" action="{{ routes.account_addresses_url }}/{{ address.id }}" onsubmit="return confirm({{ 'customer.addresses.confirm_delete' | t | json }})"><input type="hidden" name="_method" value="delete"><button class="btn btn--ghost btn--sm" type="submit">{{ 'customer.addresses.delete' | t }}</button></form>
+                </div>
+                <div class="address-form-wrap" data-address-form="{{ address.id }}" hidden>
+                  {%- form 'customer_address', address, class: 'address-form' -%}
+                    {% render 'address-fields', form: form, address: address %}
+                    <div style="display:flex;gap:8px"><button class="btn btn--primary" type="submit">{{ 'customer.addresses.save' | t }}</button><button class="btn btn--ghost" type="button" data-address-toggle="{{ address.id }}">{{ 'customer.addresses.cancel' | t }}</button></div>
+                  {%- endform -%}
+                </div>
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- else -%}
+          <p class="muted">{{ 'customer.addresses.none' | t }}</p>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-address-toggle]'); if (!b) return;
+    var f = document.querySelector('[data-address-form="' + b.dataset.addressToggle + '"]'); if (f) f.hidden = !f.hidden;
+  });
+</script>
+{% schema %}
+{ "name": "Addresses", "settings": [] }
+{% endschema %}
