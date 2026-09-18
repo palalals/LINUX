@@ -1,0 +1,89 @@
+{%- liquid
+  assign s = section.settings
+  assign primary_href = s.primary_link | default: routes.all_products_collection_url
+  assign secondary_href = s.secondary_link | default: routes.all_products_collection_url
+-%}
+<section class="section wrap" id="s-{{ section.id }}">
+  <div class="campaign glass{% if s.flip %} campaign--flip{% endif %}" data-specular data-reveal>
+    <div class="campaign__media media media__zoom">
+      {%- if s.image != blank -%}
+        <img src="{{ s.image | image_url: width: 1200 }}" alt="" width="1200" height="1500" loading="lazy">
+      {%- else -%}
+        <img src="{{ 'brand-lookbook-2.webp' | asset_url }}" alt="" width="1000" height="1334" loading="lazy">
+      {%- endif -%}
+    </div>
+    <div class="campaign__body">
+      <p class="eyebrow">{% render 'tr', value: s.eyebrow, key: 'home.campaign_eyebrow' %}</p>
+      <h2 class="display" style="font-size:clamp(34px,4.4vw,64px)">{% render 'tr', value: s.heading, key: 'home.campaign_heading' %}</h2>
+      <p class="lede">{% render 'tr', value: s.body, key: 'home.campaign_body' %}</p>
+      <div class="campaign__cta">
+        <a href="{% render 'nav-url', url: primary_href %}" class="btn btn--primary" data-magnetic>{% render 'tr', value: s.primary_label, key: 'home.campaign_primary' %}{% render 'icon', name: 'arrow-right' %}</a>
+        <a href="{% render 'nav-url', url: secondary_href %}" class="btn btn--glass">{% render 'tr', value: s.secondary_label, key: 'home.campaign_secondary' %}</a>
+      </div>
+      <p class="mono muted">{% render 'tr', value: s.note, key: 'home.campaign_note' %}</p>
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "Campaign",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "checkbox",
+      "id": "flip",
+      "label": "Image on the right",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow (blank = translated)"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading (blank = translated)"
+    },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "Text (blank = translated)"
+    },
+    {
+      "type": "text",
+      "id": "primary_label",
+      "label": "Primary button (blank = translated)"
+    },
+    {
+      "type": "url",
+      "id": "primary_link",
+      "label": "Primary link"
+    },
+    {
+      "type": "text",
+      "id": "secondary_label",
+      "label": "Secondary button (blank = translated)"
+    },
+    {
+      "type": "url",
+      "id": "secondary_link",
+      "label": "Secondary link"
+    },
+    {
+      "type": "text",
+      "id": "note",
+      "label": "Note (blank = translated)"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Campaign"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,6 @@
+{%- comment -%}
+  A working Customize destination without relying on a manually created Shopify
+  Page. `index.customize.json` is an alternate home template, which Shopify
+  renders at `/?view=customize`.
+{%- endcomment -%}
+{{- routes.root_url -}}?view=customize

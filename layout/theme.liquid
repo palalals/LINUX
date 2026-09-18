@@ -1,0 +1,209 @@
+<!doctype html>
+{%- liquid
+  assign is_rtl = false
+  if request.locale.iso_code == 'ar'
+    assign is_rtl = true
+  endif
+  assign scheme = settings.color_scheme | default: 'forest'
+-%}
+<html lang="{{ request.locale.iso_code }}" dir="{% if is_rtl %}rtl{% else %}ltr{% endif %}" class="no-js" data-scheme="{% if scheme == 'cream' %}light{% else %}dark{% endif %}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="{% if scheme == 'cream' %}#efe4d2{% else %}#043020{% endif %}">
+  <link rel="canonical" href="{{ canonical_url }}">
+  <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.shopify.com">
+
+  {%- if settings.favicon != blank -%}
+    <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 64 }}">
+    <link rel="apple-touch-icon" href="{{ settings.favicon | image_url: width: 180 }}">
+  {%- else -%}
+    <link rel="icon" type="image/png" href="{{ 'favicon-32.png' | asset_url }}">
+    <link rel="apple-touch-icon" href="{{ 'favicon-180.png' | asset_url }}">
+  {%- endif -%}
+
+  {%- liquid
+    assign seo_page_title = page_title
+    if template.name == 'search' and template.suffix == 'wishlist'
+      assign seo_page_title = 'wishlist.title' | t
+    elsif template.name == 'search'
+      assign seo_page_title = 'search.title' | t
+    elsif template.name == 'cart'
+      assign seo_page_title = 'cart.title' | t
+    elsif template.name == 'list-collections'
+      assign seo_page_title = 'collections.title' | t
+    elsif template.name == 'login'
+      assign seo_page_title = 'customer.login.title' | t
+    elsif template.name == 'register'
+      assign seo_page_title = 'customer.register.title' | t
+    elsif template.name == 'account'
+      assign seo_page_title = 'customer.account.title' | t
+    elsif template.name == 'addresses'
+      assign seo_page_title = 'customer.addresses.title' | t
+    elsif template.name == '404'
+      assign seo_page_title = 'page_404.title' | t
+    endif
+  -%}
+  {%- capture seo_title -%}
+    {{ seo_page_title }}{% if current_tags %} &ndash; {% for ct in current_tags %}{% render 'option-value', value: ct %}{% unless forloop.last %}, {% endunless %}{% endfor %}{% endif %}{% if current_page != 1 %} &ndash; {{ 'general.meta.page' | t: page: current_page }}{% endif %}{% unless seo_page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless %}
+  {%- endcapture -%}
+  <title>{{ seo_title | strip }}</title>
+  {%- if page_description -%}<meta name="description" content="{{ page_description | escape }}">{%- endif -%}
+  {% render 'meta-tags' %}
+
+  {%- unless settings.type_system_fonts -%}{% render 'fonts', is_rtl: is_rtl %}{%- endunless -%}
+
+  {{ 'glass.css' | asset_url | stylesheet_tag }}
+  {{ 'components.css' | asset_url | stylesheet_tag }}
+  {%- if settings.motion_scale != 0 -%}{{ 'motion.css' | asset_url | stylesheet_tag }}{%- endif -%}
+  {%- if template.suffix == 'customize' -%}{{ 'customize.css' | asset_url | stylesheet_tag }}{%- endif -%}
+  {%- if template.name == 'product' -%}{{ 'product.css' | asset_url | stylesheet_tag }}{%- endif -%}
+  {%- if template.name == 'collection' or template.name == 'search' or template.name == 'list-collections' -%}{{ 'collection.css' | asset_url | stylesheet_tag }}{%- endif -%}
+  {%- if template.directory == 'customers' or template.name == 'cart' or template.name == 'page' or template.name == 'blog' or template.name == 'article' or template.name == '404' -%}{{ 'pages.css' | asset_url | stylesheet_tag }}{%- endif -%}
+  {%- if template.name == 'product' or template.name == 'cart' or settings.cart_type != 'page' -%}{{ 'offers.css' | asset_url | stylesheet_tag }}{%- endif -%}
+  {{ 'v2.css' | asset_url | stylesheet_tag }}
+
+  {%- liquid
+    assign type_scale = settings.type_scale | default: 100
+    assign heading_scale = settings.heading_scale | default: 100
+    assign mobile_type_scale = settings.mobile_type_scale | default: 100
+    assign section_gap = settings.section_gap | default: 100
+    assign gutter_scale = settings.gutter_scale | default: 100
+  -%}
+  {% style %}
+    :root {
+      --page-max: {{ settings.page_width | default: 1440 }}px;
+      --glass-blur: blur({{ settings.glass_strength | default: 100 | times: 0.24 | round }}px) saturate(170%);
+      --glass-blur-solid: blur({{ settings.glass_strength | default: 100 | times: 0.36 | round }}px) saturate(180%);
+      --r-lg: {{ settings.radius_scale | default: 100 | times: 0.28 | round }}px;
+      --r-xl: {{ settings.radius_scale | default: 100 | times: 0.36 | round }}px;
+      --r-2xl: {{ settings.radius_scale | default: 100 | times: 0.44 | round }}px;
+      --r-md: {{ settings.radius_scale | default: 100 | times: 0.22 | round }}px;
+      --type-scale: {{ type_scale | divided_by: 100.0 }};
+      --heading-scale: {{ heading_scale | divided_by: 100.0 }};
+      --section-gap-scale: {{ section_gap | divided_by: 100.0 }};
+      --gutter-scale: {{ gutter_scale | divided_by: 100.0 }};
+      --section-gap: calc(clamp(64px, 9vw, 128px) * var(--section-gap-scale));
+      --gutter: calc(clamp(16px, 4vw, 48px) * var(--gutter-scale));
+      {%- if settings.brand_forest != blank and settings.brand_forest != 'rgba(0,0,0,0)' %}
+      --forest: {{ settings.brand_forest }};
+      --forest-deep: {{ settings.brand_forest | color_darken: 8 }};
+      --forest-soft: {{ settings.brand_forest | color_lighten: 6 }};
+      --forest-mist: {{ settings.brand_forest | color_lighten: 14 }};
+      --bg: {{ settings.brand_forest | color_darken: 8 }};
+      --glass-fill-solid: {{ settings.brand_forest | color_modify: 'alpha', 0.62 }};
+      {%- endif %}
+      {%- if settings.brand_cream != blank and settings.brand_cream != 'rgba(0,0,0,0)' %}
+      --cream: {{ settings.brand_cream }};
+      --fg: {{ settings.brand_cream }};
+      --fg-70: {{ settings.brand_cream | color_modify: 'alpha', 0.72 }};
+      --fg-50: {{ settings.brand_cream | color_modify: 'alpha', 0.52 }};
+      --fg-30: {{ settings.brand_cream | color_modify: 'alpha', 0.3 }};
+      --fg-12: {{ settings.brand_cream | color_modify: 'alpha', 0.12 }};
+      --glass-fill: {{ settings.brand_cream | color_modify: 'alpha', 0.07 }};
+      --glass-fill-hover: {{ settings.brand_cream | color_modify: 'alpha', 0.11 }};
+      --glass-stroke: {{ settings.brand_cream | color_modify: 'alpha', 0.16 }};
+      {%- endif %}
+      {%- if settings.brand_lime != blank and settings.brand_lime != 'rgba(0,0,0,0)' %}
+      --lime: {{ settings.brand_lime }};
+      --lime-deep: {{ settings.brand_lime | color_darken: 12 }};
+      --accent: {{ settings.brand_lime }};
+      {%- endif %}
+    }
+    @media (max-width: 760px) { :root { --type-scale: {{ type_scale | times: mobile_type_scale | divided_by: 10000.0 }}; } }
+    {%- if settings.motion_scale == 0 -%}
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    {%- endif -%}
+  {% endstyle %}
+
+  <script>document.documentElement.classList.replace('no-js', 'js');</script>
+  <script>
+    window.LINUX = window.LINUX || {};
+    LINUX.settings = {
+      moneyFormat: {{ shop.money_format | json }},
+      currencyAr: {{ settings.currency_ar | default: 'جنيه' | json }},
+      locale: {{ request.locale.iso_code | json }},
+      root: {{ routes.root_url | json }},
+      cartUrl: {{ routes.cart_url | json }},
+      freeShipping: {{ settings.free_shipping_threshold | default: 0 | times: 100 }},
+      cartType: {{ settings.cart_type | default: 'drawer' | json }},
+      whatsapp: {{ settings.whatsapp_number | default: '' | json }},
+      showWishlist: {{ settings.show_wishlist | default: true, allow_false: true | json }}
+    };
+    LINUX.strings = {
+      added: {{ 'cart.added' | t | json }},
+      discount_invalid: {{ 'cart.discount_invalid' | t | json }},
+      discount_applied: {{ 'cart.discount_applied' | t | json }},
+      view_bag: {{ 'cart.view_bag' | t | json }},
+      error: {{ 'general.error' | t | json }},
+      sold_out: {{ 'products.sold_out' | t | json }},
+      unavailable: {{ 'products.unavailable' | t | json }},
+      add_to_bag: {{ 'products.add_to_bag' | t | json }},
+      saved: {{ 'wishlist.saved' | t | json }},
+      removed: {{ 'wishlist.removed' | t | json }},
+      no_results: {{ 'search.no_results' | t | json }},
+      products: {{ 'search.products' | t | json }},
+      collections: {{ 'search.collections' | t | json }},
+      pages: {{ 'search.pages' | t | json }},
+      free_shipping_unlocked: {{ 'cart.free_shipping_unlocked' | t | json }},
+      free_shipping_away: {{ 'cart.free_shipping_away' | t: amount: '[amount]' | json }},
+      copied: {{ 'general.copied' | t | json }}
+    };
+    {%- if request.locale.iso_code == 'ar' -%}
+    {%- assign ov_keys = 'hoodie,hoodies,shirt,shirts,t-shirt,tee,cap,black,white,beige,burgundy,olive,green,navy,grey,gray,red,blue,brown,cream,sada,anime,customize,flower,oversized,zip,classic,winter,summer,collection,embroidered,kids,men,women,unisex,pack,set' | split: ',' -%}
+    {%- capture ov -%}{%- for k in ov_keys -%}{%- assign key = 'products.option_values.' | append: k -%}{%- assign v = key | t -%}{%- assign v_lc = v | downcase -%}{%- unless v_lc contains 'translation missing' -%}{{ k | json }}:{{ v | json }},{%- endunless -%}{%- endfor -%}{%- endcapture -%}
+    LINUX.words = { {{ ov | strip | split: ',' | join: ',' }} };
+    {%- endif -%}
+  </script>
+  {{ content_for_header }}
+</head>
+
+<body class="template-{{ template.name | handle }}{% if template.suffix %} template-{{ template.name | handle }}-{{ template.suffix | handle }}{% endif %}{% if is_rtl %} is-rtl{% endif %}{% if settings.mobile_two_col == false %} mobile-one-col{% endif %}{% if settings.show_wishlist == false %} no-wishlist{% endif %}" data-cart-type="{{ settings.cart_type | default: 'drawer' }}">
+  <a class="skip-link" href="#main">{{ 'accessibility.skip_to_content' | t }}</a>
+  {%- if template.name == 'index' and settings.show_curtain -%}<div class="curtain" aria-hidden="true">{% render 'brand-logo', height: 40 %}</div>{%- endif -%}
+
+  <div class="atmosphere" aria-hidden="true">
+    <span class="atmosphere__orb atmosphere__orb--a"></span>
+    <span class="atmosphere__orb atmosphere__orb--b"></span>
+    <span class="atmosphere__orb atmosphere__orb--c"></span>
+    <span class="atmosphere__grain"></span>
+  </div>
+
+  {% sections 'header-group' %}
+
+  <main id="main" role="main" tabindex="-1" class="main">
+    {{ content_for_layout }}
+  </main>
+
+  {% sections 'footer-group' %}
+
+  {%- if settings.cart_type != 'page' -%}{% section 'cart-drawer' %}{%- endif -%}
+  {% render 'menu-drawer' %}
+  {% render 'search-overlay' %}
+  {% render 'quick-view' %}
+  {%- if settings.show_tab_bar != false -%}{% render 'tab-bar' %}{%- endif -%}
+  {%- liquid
+    assign show_fab = false
+    if settings.whatsapp_number != blank
+      if settings.whatsapp_fab_scope == 'everywhere'
+        assign show_fab = true
+      elsif settings.whatsapp_fab_scope == 'customize' and template.suffix == 'customize'
+        assign show_fab = true
+      endif
+    endif
+  -%}
+  {%- if show_fab -%}{% render 'whatsapp-fab' %}{%- endif -%}
+  <div class="toast-stack" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="{{ 'global.js' | asset_url }}" defer></script>
+  <script src="{{ 'glass.js' | asset_url }}" defer></script>
+  <script src="{{ 'cart.js' | asset_url }}" defer></script>
+  <script src="{{ 'drawers.js' | asset_url }}" defer></script>
+  <script src="{{ 'search.js' | asset_url }}" defer></script>
+  <script src="{{ 'wishlist.js' | asset_url }}" defer></script>
+  <script src="{{ 'product.js' | asset_url }}" defer></script>
+  {%- if template.name == 'collection' or template.name == 'search' -%}<script src="{{ 'collection.js' | asset_url }}" defer></script>{%- endif -%}
+  {%- if template.suffix == 'customize' -%}<script src="{{ 'customize.js' | asset_url }}" defer></script>{%- endif -%}
+</body>
+</html>

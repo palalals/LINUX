@@ -1,0 +1,7 @@
+<nav class="account__nav glass" aria-label="{{ 'customer.account.title' | t }}">
+  <a href="{{ routes.account_url }}" class="{% if active == 'orders' %}is-active{% endif %}">{% render 'icon', name: 'package', px: 18 %}<span>{{ 'customer.account.orders' | t }}</span></a>
+  <a href="{{ routes.account_addresses_url }}" class="{% if active == 'addresses' %}is-active{% endif %}">{% render 'icon', name: 'pin', px: 18 %}<span>{{ 'customer.account.addresses' | t }}</span></a>
+  <a href="/pages/wishlist">{% render 'icon', name: 'heart', px: 18 %}<span>{{ 'wishlist.title' | t }}</span></a>
+  <a href="{% render 'customize-url' %}">{% render 'icon', name: 'palette', px: 18 %}<span>{{ 'nav.menu.customize' | t }}</span></a>
+  <a href="{{ routes.account_logout_url }}" class="account__nav-logout">{% render 'icon', name: 'arrow-left', px: 18 %}<span>{{ 'customer.account.logout' | t }}</span></a>
+</nav>

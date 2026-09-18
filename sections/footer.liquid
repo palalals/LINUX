@@ -1,0 +1,180 @@
+{%- assign s = section.settings -%}
+<footer class="footer" role="contentinfo">
+  <div class="footer__inner glass">
+    {%- if s.show_mascot -%}
+      <div class="footer__mascot" aria-hidden="true">{% render 'mascot', name: 'hoodie-sit', width: 110 %}</div>
+    {%- endif -%}
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">{% render 'brand-logo', height: 28 %}</a>
+        <p class="footer__tagline">{% render 'tr', value: s.tagline, key: 'home.footer_tagline' %}</p>
+        <div class="footer__social">
+          {%- if settings.social_instagram != blank -%}<a href="{{ settings.social_instagram }}" class="icon-btn" target="_blank" rel="noopener" aria-label="Instagram">{% render 'icon', name: 'instagram' %}</a>{%- endif -%}
+          {%- if settings.social_tiktok != blank -%}<a href="{{ settings.social_tiktok }}" class="icon-btn" target="_blank" rel="noopener" aria-label="TikTok">{% render 'icon', name: 'tiktok' %}</a>{%- endif -%}
+          {%- if settings.social_facebook != blank -%}<a href="{{ settings.social_facebook }}" class="icon-btn" target="_blank" rel="noopener" aria-label="Facebook">{% render 'icon', name: 'facebook' %}</a>{%- endif -%}
+          {%- if settings.whatsapp_number != blank -%}<a href="https://wa.me/{{ settings.whatsapp_number | remove: '+' | remove: ' ' }}" class="icon-btn" target="_blank" rel="noopener" aria-label="WhatsApp">{% render 'icon', name: 'whatsapp' %}</a>{%- endif -%}
+        </div>
+        {%- if s.show_newsletter -%}
+          <div class="footer__newsletter">
+            <p class="small muted">{{ 'newsletter.footer_label' | t }}</p>
+            {%- form 'customer', id: 'footer-newsletter', class: 'newsletter__form glass glass--pill' -%}
+              {%- if form.posted_successfully? -%}
+                <p class="form-success" style="padding:12px 16px">{{ 'newsletter.success' | t }}</p>
+              {%- else -%}
+                <input type="hidden" name="contact[tags]" value="newsletter">
+                <input class="input" type="email" name="contact[email]" placeholder="{{ 'newsletter.placeholder' | t }}" autocomplete="email" required aria-label="{{ 'newsletter.placeholder' | t }}">
+                <button class="btn btn--primary" type="submit">{{ 'newsletter.button' | t }}</button>
+              {%- endif -%}
+            {%- endform -%}
+          </div>
+        {%- endif -%}
+      </div>
+      {%- comment -%}Keep the original three columns even before navigation menus are configured.{%- endcomment -%}
+      {%- for column in (1..3) -%}
+        {%- liquid
+          assign block = section.blocks[forloop.index0]
+          assign menu = block.settings.menu
+          assign menu_handle = menu.handle | default: menu
+          if menu.links == blank
+            assign menu = linklists[menu_handle]
+          endif
+          assign fallback_column = column
+          case menu_handle
+            when 'footer-shop'
+              assign fallback_column = 1
+            when 'footer-help'
+              assign fallback_column = 2
+            when 'footer-about'
+              assign fallback_column = 3
+          endcase
+        -%}
+        <div class="footer__col" {{ block.shopify_attributes }}>
+          <h4>
+            {%- if block.settings.title != blank -%}
+              {% render 'menu-title', title: block.settings.title %}
+            {%- elsif menu.title != blank -%}
+              {% render 'menu-title', title: menu.title %}
+            {%- else -%}
+              {%- case fallback_column -%}
+                {%- when 1 -%}{{ 'nav.menu.shop' | t }}
+                {%- when 2 -%}{{ 'nav.menu.help' | t }}
+                {%- when 3 -%}{{ 'nav.menu.about' | t }}
+              {%- endcase -%}
+            {%- endif -%}
+          </h4>
+          <ul>
+            {%- if menu.links != blank -%}
+              {%- for link in menu.links -%}
+                <li><a href="{% render 'nav-url', url: link.url, title: link.title %}">{% render 'menu-title', title: link.title %}</a></li>
+              {%- endfor -%}
+            {%- else -%}
+              {%- case fallback_column -%}
+                {%- when 1 -%}
+                  {%- if collections['winter-collection'].url != blank -%}<li><a href="{{ collections['winter-collection'].url }}">{{ 'nav.menu.winter_collection' | t }}</a></li>{%- endif -%}
+                  {%- if collections['summer-collection'].url != blank -%}<li><a href="{{ collections['summer-collection'].url }}">{{ 'nav.menu.summer_collection' | t }}</a></li>{%- endif -%}
+                  {%- if collections['winter-collection'].url == blank and collections['summer-collection'].url == blank -%}<li><a href="{{ routes.collections_url }}">{{ 'nav.menu.collections' | t }}</a></li>{%- endif -%}
+                  <li><a href="{% render 'customize-url' %}">{{ 'nav.menu.customize' | t }}</a></li>
+                  <li><a href="{{ routes.all_products_collection_url }}">{{ 'nav.menu.all_products' | t }}</a></li>
+                {%- when 2 -%}
+                  {%- assign help_pages = 'size-guide,shipping-returns,faq,contact' | split: ',' -%}
+                  {%- assign help_titles = 'Size guide,Shipping & returns,FAQ,Contact' | split: ',' -%}
+                  {%- for handle in help_pages -%}
+                    {%- if pages[handle].url != blank -%}<li><a href="{% render 'nav-url', url: pages[handle].url %}">{% render 'menu-title', title: help_titles[forloop.index0] %}</a></li>{%- endif -%}
+                  {%- endfor -%}
+                  {%- if pages['shipping-returns'].url == blank and shop.shipping_policy.body != blank -%}<li><a href="{% render 'nav-url', url: shop.shipping_policy.url %}">{{ 'nav.menu.shipping_policy' | t }}</a></li>{%- endif -%}
+                  {%- if pages['shipping-returns'].url == blank and shop.refund_policy.body != blank -%}<li><a href="{% render 'nav-url', url: shop.refund_policy.url %}">{{ 'nav.menu.refund_policy' | t }}</a></li>{%- endif -%}
+                  <li><a href="{{ routes.search_url }}">{{ 'nav.search' | t }}</a></li>
+                  {%- if pages['contact'].url == blank -%}
+                    {%- if shop.customer_accounts_enabled -%}
+                      <li><a href="{{ routes.account_url }}">{{ 'nav.menu.account' | t }}</a></li>
+                    {%- else -%}
+                      <li><a href="{{ routes.cart_url }}">{{ 'nav.bag' | t }}</a></li>
+                    {%- endif -%}
+                  {%- endif -%}
+                {%- when 3 -%}
+                  {%- assign about_page = pages['about'] | default: pages['our-story'] -%}
+                  {%- if about_page.url != blank -%}
+                    <li><a href="{% render 'nav-url', url: about_page.url %}">{{ 'nav.menu.our_story' | t }}</a></li>
+                  {%- else -%}
+                    <li><a href="{{ routes.root_url }}">{{ 'nav.home' | t }}</a></li>
+                  {%- endif -%}
+                  {%- if blogs['news'].url != blank -%}
+                    <li><a href="{{ blogs['news'].url }}">{{ 'nav.menu.journal' | t }}</a></li>
+                  {%- elsif settings.show_wishlist != false -%}
+                    <li><a href="/pages/wishlist">{{ 'wishlist.title' | t }}</a></li>
+                  {%- else -%}
+                    <li><a href="{{ routes.collections_url }}">{{ 'nav.menu.collections' | t }}</a></li>
+                  {%- endif -%}
+                  {%- if shop.privacy_policy.body != blank -%}<li><a href="{% render 'nav-url', url: shop.privacy_policy.url %}">{{ 'nav.menu.privacy_policy' | t }}</a></li>{%- endif -%}
+                  {%- if shop.terms_of_service.body != blank -%}<li><a href="{% render 'nav-url', url: shop.terms_of_service.url %}">{{ 'nav.menu.terms_of_service' | t }}</a></li>{%- endif -%}
+              {%- endcase -%}
+            {%- endif -%}
+          </ul>
+        </div>
+      {%- endfor -%}
+    </div>
+    <div class="footer__bottom">
+      <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }} · {% render 'tr', value: settings.made_in, key: 'footer.made_in' %}</p>
+      {%- if settings.show_footer_policies != false -%}
+      <div class="footer__policies">
+        {%- for policy in shop.policies -%}{%- if policy.title != blank and policy.url != blank -%}<a href="{% render 'nav-url', url: policy.url %}">{% render 'menu-title', title: policy.title %}</a>{%- endif -%}{%- endfor -%}
+      </div>
+      {%- endif -%}
+      {%- if s.show_payment_icons and settings.show_payment_icons != false -%}
+        <div class="payment-icons" aria-label="{{ 'footer.payment' | t }}">
+          {%- for type in shop.enabled_payment_types -%}{{ type | payment_type_svg_tag }}{%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "tagline",
+      "label": "Tagline (blank = translated)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_newsletter",
+      "label": "Show newsletter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Show payment icons",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mascot",
+      "label": "Show penguin",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Link column",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,39 @@
+{
+  "current": {
+    "color_scheme": "forest",
+    "glass_strength": 100,
+    "radius_scale": 100,
+    "motion_scale": 100,
+    "page_width": 1440,
+    "type_system_fonts": false,
+    "side_menu": "main-menu",
+    "search_suggestions": "Hoodie,Anime,Customize,Sada,Shirt",
+    "cart_type": "drawer",
+    "free_shipping_threshold": 2000,
+    "show_stock_hint": true,
+    "low_stock": 5,
+    "show_size_guide": true,
+    "show_sticky_atc": true,
+    "show_recently_viewed": true,
+    "show_delivery_estimate": true,
+    "delivery_cairo": "1–2 days",
+    "delivery_egypt": "2–4 days",
+    "whatsapp_number": "201110351549",
+    "social_instagram": "https://www.instagram.com/linux.eg",
+    "social_facebook": "https://www.facebook.com/share/1CBF7WFvep",
+    "social_tiktok": "",
+    "show_curtain": true
+  },
+  "presets": {
+    "Forest": {
+      "color_scheme": "forest",
+      "glass_strength": 100,
+      "radius_scale": 100
+    },
+    "Cream": {
+      "color_scheme": "cream",
+      "glass_strength": 90,
+      "radius_scale": 100
+    }
+  }
+}

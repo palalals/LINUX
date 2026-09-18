@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-404",
+      "blocks": {
+        "shop": { "type": "link", "settings": { "key_title": "nav.shop", "key_text": "page_404.link_shop", "url": "/collections/all", "icon": "tag" } },
+        "customize": { "type": "link", "settings": { "key_title": "nav.menu.customize", "key_text": "page_404.link_customize", "url": "/pages/customize", "icon": "palette" } },
+        "help": { "type": "link", "settings": { "key_title": "nav.menu.contact", "key_text": "page_404.link_help", "url": "/pages/contact", "icon": "message" } }
+      },
+      "block_order": ["shop", "customize", "help"],
+      "settings": { "show_search": true, "show_products": true, "limit": 4, "mascot": "classic" }
+    }
+  },
+  "order": ["main"]
+}

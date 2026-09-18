@@ -1,0 +1,30 @@
+{
+  "type": "header",
+  "name": "Header group",
+  "sections": {
+    "header": {
+      "type": "header",
+      "blocks": {
+        "promo": {
+          "type": "mega_promo",
+          "settings": {
+            "menu_item": "Shop",
+            "link": "/collections/winter-collection"
+          }
+        }
+      },
+      "block_order": [
+        "promo"
+      ],
+      "settings": {
+        "menu": "main-menu",
+        "logo_height": 22,
+        "show_shop_cta": true,
+        "show_announcement": true
+      }
+    }
+  },
+  "order": [
+    "header"
+  ]
+}

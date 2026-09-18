@@ -1,0 +1,39 @@
+{%- if cart.item_count > 0 -%}
+  <div class="cart-extras">
+  {%- if settings.show_cart_discount != false -%}
+  <div class="cart-discount" data-cart-discount>
+    <label class="cart-discount__row">
+      <span class="visually-hidden">{{ 'cart.discount_code' | t }}</span>
+      {% render 'icon', name: 'tag', px: 16 %}
+      <input class="input" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="{{ 'cart.discount_placeholder' | t }}" data-discount-input>
+      <button class="btn btn--glass btn--sm" type="button" data-discount-apply>{{ 'cart.apply_discount' | t }}</button>
+    </label>
+    <div class="cart-discount__codes" data-discount-codes>
+      {%- for code in cart.discount_codes -%}
+        <span class="chip chip--code{% unless code.applicable %} is-invalid{% endunless %}">{% render 'icon', name: 'tag', px: 12 %}{{ code.code }}<button type="button" data-discount-remove="{{ code.code | escape }}" aria-label="{{ 'cart.remove' | t }}">{% render 'icon', name: 'close', px: 12 %}</button></span>
+      {%- endfor -%}
+    </div>
+    <p class="form-error" data-discount-error hidden></p>
+  </div>
+  {%- endif -%}
+  {%- if settings.show_cart_note != false -%}
+  <details class="cart-note">
+    <summary>{% render 'icon', name: 'message', px: 14 %}{{ 'cart.add_note' | t }}</summary>
+    <textarea class="textarea" name="note" data-cart-note placeholder="{{ 'cart.note_placeholder' | t }}">{{ cart.note }}</textarea>
+  </details>
+  {%- endif -%}
+  </div>
+  <div class="cart-totals">
+    {%- if cart.total_discount > 0 -%}
+      <div class="cart-totals__row"><span>{{ 'cart.discount' | t }}</span><span>−{% render 'money', amount: cart.total_discount %}</span></div>
+    {%- endif -%}
+    <div class="cart-totals__row cart-totals__row--total"><span>{{ 'cart.subtotal' | t }}<small>{{ 'cart.shipping_note' | t }}</small></span><span class="money" data-cart-total>{% render 'money', amount: cart.total_price %}</span></div>
+  </div>
+  <form action="{{ routes.cart_url }}" method="post" class="cart-actions" style="display:grid;gap:10px">
+    <button class="btn btn--primary btn--lg btn--block" type="submit" name="checkout">{% render 'icon', name: 'lock', px: 18 %}{{ 'cart.checkout' | t }}</button>
+    {%- if context == 'drawer' and settings.cart_type == 'drawer' -%}
+      <a href="{{ routes.cart_url }}" class="btn btn--ghost btn--sm btn--block">{{ 'cart.view_bag' | t }}</a>
+    {%- endif -%}
+  </form>
+  {%- if context != 'drawer' -%}<div class="payment-icons">{%- for type in shop.enabled_payment_types -%}{{ type | payment_type_svg_tag }}{%- endfor -%}</div>{%- endif -%}
+{%- endif -%}

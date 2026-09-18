@@ -1,0 +1,126 @@
+{%- assign s = section.settings -%}
+<section class="section wrap" id="s-{{ section.id }}">
+  <div class="faq">
+    <div data-reveal>
+      <p class="eyebrow">{%- assign k_eyebrow = s.key_eyebrow | default: 'home.faq_eyebrow' -%}{%- assign k_heading = s.key_heading | default: 'home.faq_heading' -%}{%- assign k_body = s.key_body | default: 'home.faq_body' -%}{% render 'tr', value: s.eyebrow, key: k_eyebrow %}</p>
+      <h2>{% render 'tr', value: s.heading, key: k_heading %}</h2>
+      <p class="lede" style="margin-top:14px">{% render 'tr', value: s.body, key: k_body %}</p>
+      {%- liquid
+        assign faq_cta = s.cta_url
+        if faq_cta == blank and settings.whatsapp_number != blank
+          assign wa_num = settings.whatsapp_number | remove: '+' | remove: ' ' | remove: '-'
+          assign faq_cta = 'https://wa.me/' | append: wa_num
+        endif
+        if faq_cta == blank
+          assign faq_cta = pages['contact'].url | default: routes.root_url
+        endif
+      -%}
+      <a href="{{ faq_cta }}" class="btn btn--glass" style="margin-top:22px"{% if faq_cta contains 'wa.me' %} target="_blank" rel="noopener"{% endif %}>{% render 'icon', name: 'whatsapp', px: 18 %}{% render 'tr', value: s.cta_label, key: 'home.faq_cta' %}</a>
+    </div>
+    <div class="faq__list">
+      {%- for block in section.blocks -%}
+        <details class="faq__item glass"{% if forloop.first and s.open_first %} open{% endif %} data-reveal style="--i: {{ forloop.index0 }}" {{ block.shopify_attributes }}>
+          <summary>{% render 'tr', value: block.settings.question, key: block.settings.key_q %}{% render 'icon', name: 'plus', px: 18 %}</summary>
+          <div class="rte">{% render 'tr', value: block.settings.answer, key: block.settings.key_a %}</div>
+        </details>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "FAQ",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow (blank = translated)"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading (blank = translated)"
+    },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "Text (blank = translated)"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_first",
+      "label": "Open first item",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button (blank = translated)"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Link"
+    },
+    {
+      "type": "text",
+      "id": "key_eyebrow",
+      "label": "Translation key — eyebrow (optional)"
+    },
+    {
+      "type": "text",
+      "id": "key_heading",
+      "label": "Translation key — heading (optional)"
+    },
+    {
+      "type": "text",
+      "id": "key_body",
+      "label": "Translation key — body (optional)"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "Question",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer"
+        },
+        {
+          "type": "text",
+          "id": "key_q",
+          "label": "Translation key — question (optional)"
+        },
+        {
+          "type": "text",
+          "id": "key_a",
+          "label": "Translation key — answer (optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ",
+      "blocks": [
+        {
+          "type": "question"
+        },
+        {
+          "type": "question"
+        },
+        {
+          "type": "question"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

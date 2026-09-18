@@ -1,0 +1,45 @@
+<section class="page wrap">
+  <header class="page__head" data-reveal>
+    <p class="eyebrow">{{ 'contact.title' | t }}</p>
+    <h1>{{ 'home.contact_heading' | t }}</h1>
+    <div class="lede" style="text-align:center">{%- assign fb = 'home.contact_body' | t -%}{%- if page.content != blank -%}{% render 'localized-content', content: page.content, fallback: fb %}{%- else -%}{{ fb }}{%- endif -%}</div>
+  </header>
+  <div class="contact">
+    <div class="contact__side">
+      {%- if settings.whatsapp_number != blank -%}
+        <div class="contact__card glass glass--hover" data-reveal>
+          {% render 'icon', name: 'whatsapp', px: 26 %}
+          <h3>{{ 'contact.whatsapp_title' | t }}</h3>
+          <p class="muted small">{{ 'contact.whatsapp_body' | t }}</p>
+          <a href="https://wa.me/{{ settings.whatsapp_number | remove: '+' | remove: ' ' }}" class="btn btn--primary btn--sm" target="_blank" rel="noopener">{{ 'contact.whatsapp_cta' | t }}</a>
+        </div>
+      {%- endif -%}
+      <div class="contact__card glass" data-reveal style="--i:1">
+        {% render 'icon', name: 'mail', px: 26 %}
+        <h3>{{ shop.email }}</h3>
+        <p class="muted small">{{ 'contact.hours' | t }}</p>
+      </div>
+      <div class="contact__card glass" data-reveal style="--i:2">
+        {% render 'icon', name: 'pin', px: 26 %}
+        <h3>{{ 'contact.studio' | t }}</h3>
+        <div class="statement__mascots" style="justify-content:flex-start;margin-top:8px">{% render 'mascot', name: 'boombox', width: 80 %}</div>
+      </div>
+    </div>
+    {%- form 'contact', class: 'contact__form glass', data-reveal: '' -%}
+      {%- if form.posted_successfully? -%}
+        <p class="form-success">{{ 'contact.success' | t }}</p>
+      {%- endif -%}
+      {{ form.errors | default_errors }}
+      <div class="contact__row">
+        <label class="field"><span class="field__label">{{ 'contact.name' | t }}</span><input class="input" type="text" name="contact[name]" autocomplete="name" required></label>
+        <label class="field"><span class="field__label">{{ 'contact.email' | t }}</span><input class="input" type="email" name="contact[email]" autocomplete="email" required></label>
+      </div>
+      <label class="field"><span class="field__label">{{ 'contact.phone' | t }}</span><input class="input" type="tel" name="contact[phone]" autocomplete="tel"></label>
+      <label class="field"><span class="field__label">{{ 'contact.message' | t }}</span><textarea class="textarea" name="contact[body]" required></textarea></label>
+      <button class="btn btn--primary btn--lg" type="submit">{{ 'contact.send' | t }}{% render 'icon', name: 'arrow-right' %}</button>
+    {%- endform -%}
+  </div>
+</section>
+{% schema %}
+{ "name": "Contact", "settings": [] }
+{% endschema %}
