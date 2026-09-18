@@ -1,0 +1,88 @@
+{%- comment -%}
+  Escaped href for menu links. Only repair known local page-route mistakes;
+  preserve external destinations, search parameters, and fragments.
+{%- endcomment -%}
+{%- liquid
+  assign href = url | default: routes.root_url | strip
+  assign normalized_title = title | default: '' | strip | downcase
+  assign original_path = href | split: '#' | first | split: '?' | first
+  assign path = original_path
+  assign prefix = path | slice: 0, 2
+  assign first_character = path | slice: 0, 1
+  assign local_link = false
+  if prefix == '//' or path contains '://'
+    assign host = path | split: '//' | last | split: '/' | first
+    if host == request.host or host == shop.domain or host == shop.permanent_domain
+      assign scheme = path | split: '//' | first
+      if prefix == '//'
+        assign scheme = ''
+      endif
+      assign origin = scheme | append: '//' | append: host
+      assign path = path | remove_first: origin
+      assign local_link = true
+    endif
+  elsif first_character == '/'
+    assign local_link = true
+  endif
+
+  assign normalized_url = href
+  assign mapped = false
+  assign force_view = false
+  assign drop_query = false
+  if normalized_title == 'saved' or normalized_title == 'المحفوظات' or normalized_title == 'المحفوظ' or normalized_title == 'wishlist' or normalized_title == 'favorites' or normalized_title == 'favourites'
+    assign normalized_url = '/pages/wishlist'
+    assign mapped = true
+    assign force_view = true
+  elsif normalized_title == 'home' or normalized_title == 'الرئيسية' or normalized_title == 'الرئيسيه' or normalized_title == 'الصفحة الرئيسية' or normalized_title == 'الصفحه الرئيسية'
+    assign normalized_url = routes.root_url
+    assign mapped = true
+    assign drop_query = true
+  elsif local_link
+    assign path = path | append: '/' | replace: '//', '/'
+    assign pages_prefix = routes.root_url | append: '/pages/' | replace: '//', '/'
+    assign wishlist_path = pages_prefix | append: 'wishlist/'
+    assign search_path = pages_prefix | append: 'search/'
+    assign customize_path = pages_prefix | append: 'customize/'
+    if path == '/pages/wishlist/' or path == wishlist_path
+      assign normalized_url = '/pages/wishlist'
+      assign mapped = true
+      assign force_view = true
+    elsif path == '/pages/search/' or path == search_path
+      assign normalized_url = routes.search_url
+      assign mapped = true
+    elsif path == '/pages/customize/' or path == customize_path
+      capture normalized_url
+        render 'customize-url'
+      endcapture
+      assign normalized_url = normalized_url | strip
+      assign mapped = true
+      assign force_view = true
+    endif
+  endif
+
+  if mapped
+    assign before_fragment = href | split: '#' | first
+    if before_fragment contains '?' and drop_query == false
+      assign query = before_fragment | split: '?' | last | split: '&'
+      for parameter in query
+        assign key = parameter | split: '=' | first
+        if parameter == blank
+          continue
+        endif
+        if key == 'view' and force_view
+          continue
+        endif
+        assign separator = '?'
+        if normalized_url contains '?'
+          assign separator = '&'
+        endif
+        assign normalized_url = normalized_url | append: separator | append: parameter
+      endfor
+    endif
+    if href contains '#' and drop_query == false
+      assign fragment = href | split: '#' | last
+      assign normalized_url = normalized_url | append: '#' | append: fragment
+    endif
+  endif
+  echo normalized_url | escape
+-%}

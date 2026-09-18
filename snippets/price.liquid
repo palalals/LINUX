@@ -1,0 +1,30 @@
+{%- comment -%} Price for a product or variant with discount percentage. {%- endcomment -%}
+{%- liquid
+  if variant
+    assign price = variant.price
+    assign compare = variant.compare_at_price
+    assign varies = false
+  else
+    assign price = product.price_min
+    assign compare = product.compare_at_price_max
+    assign varies = product.price_varies
+  endif
+  assign on_sale = false
+  if compare > price
+    assign on_sale = true
+  endif
+-%}
+<span class="price{% if on_sale %} price--sale{% endif %}{% if class %} {{ class }}{% endif %}" data-price>
+  {%- if varies and product.price_min != product.price_max -%}<span class="price__from">{{ 'products.from' | t }}</span> {% endif -%}
+  <span class="price__current{% if on_sale %} price__sale{% endif %}" data-price-current>{% render 'money', amount: price %}</span>
+  {%- if on_sale -%}
+    {%- assign discount_pct = compare | minus: price | times: 100 | divided_by: compare -%}
+    {%- if request.locale.iso_code == 'ar' -%}
+      {%- assign discount_ar = discount_pct | append: '' | replace: '0', '٠' | replace: '1', '١' | replace: '2', '٢' | replace: '3', '٣' | replace: '4', '٤' | replace: '5', '٥' | replace: '6', '٦' | replace: '7', '٧' | replace: '8', '٨' | replace: '9', '٩' -%}
+      <span class="price__discount">خصم {{ discount_ar }}%</span>
+    {%- else -%}
+      <span class="price__discount">-{{ discount_pct }}%</span>
+    {%- endif -%}
+  {%- endif -%}
+  {%- if on_sale and settings.card_show_compare != false -%}<s class="price__compare" data-price-compare>{% render 'money', amount: compare %}</s>{%- endif -%}
+</span>

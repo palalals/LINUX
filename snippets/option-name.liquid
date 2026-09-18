@@ -1,0 +1,12 @@
+{%- comment -%} Localized product option name: 'Color' -> 'اللون'. Already-Arabic names (translated in Shopify) pass through. {%- endcomment -%}
+{%- assign k = name | downcase | strip | replace: ' ', '_' -%}
+{%- assign has_ar = false -%}
+{%- assign probe = 'ا,ب,ت,ث,ج,ح,خ,د,ذ,ر,ز,س,ش,ص,ض,ط,ظ,ع,غ,ف,ق,ك,ل,م,ن,ه,و,ي,ى,ة,ء,أ,إ,آ,ؤ,ئ' | split: ',' -%}
+{%- for ch in probe -%}{%- if k contains ch -%}{%- assign has_ar = true -%}{%- break -%}{%- endif -%}{%- endfor -%}
+{%- if has_ar or k == blank -%}{{ name }}
+{%- else -%}
+  {%- assign key = 'products.option_names.' | append: k -%}
+  {%- assign out = key | t -%}
+  {%- assign out_lc = out | downcase -%}
+  {%- if out_lc contains 'translation missing' -%}{{ name }}{%- else -%}{{ out }}{%- endif -%}
+{%- endif -%}

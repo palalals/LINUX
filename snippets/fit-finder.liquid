@@ -1,0 +1,33 @@
+{%- comment -%}
+  "Find your size" — height/weight → suggested size. Heuristic only; the disclaimer is
+  mandatory copy. Param: block, product, size_option
+{%- endcomment -%}
+<details class="fit glass" data-fit {{ block.shopify_attributes }}>
+  <summary class="fit__summary">
+    <span class="fit__icon">{% render 'icon', name: 'ruler', px: 18 %}</span>
+    <span><strong>{% render 'tr', value: block.settings.title, key: 'fit.title' %}</strong><small class="muted">{{ 'fit.subtitle' | t }}</small></span>
+    {% render 'icon', name: 'plus', px: 18 %}
+  </summary>
+  <div class="fit__body">
+    <div class="fit__inputs">
+      <label class="field"><span class="field__label">{{ 'fit.height' | t }}</span><input class="input" type="number" inputmode="numeric" min="140" max="210" placeholder="175" data-fit-height></label>
+      <label class="field"><span class="field__label">{{ 'fit.weight' | t }}</span><input class="input" type="number" inputmode="numeric" min="40" max="150" placeholder="75" data-fit-weight></label>
+    </div>
+    <div class="field">
+      <span class="field__label">{{ 'fit.style' | t }}</span>
+      <div class="segmented" role="radiogroup">
+        <button class="segmented__btn is-active" type="button" data-fit-style="oversized" aria-pressed="true">{{ 'fit.oversized' | t }}</button>
+        <button class="segmented__btn" type="button" data-fit-style="regular" aria-pressed="false">{{ 'fit.regular' | t }}</button>
+      </div>
+    </div>
+    <button class="btn btn--glass btn--block" type="button" data-fit-calc>{% render 'icon', name: 'sparkle', px: 16 %}{{ 'fit.cta' | t }}</button>
+    <div class="fit__result" data-fit-result hidden>
+      <p class="fit__label">{{ 'fit.result' | t }}</p>
+      <p class="fit__size" data-fit-size>M</p>
+      <p class="small muted" data-fit-alt></p>
+      <button class="btn btn--primary btn--sm" type="button" data-fit-select>{{ 'fit.select' | t }}</button>
+    </div>
+    <p class="fit__disclaimer small muted">{% render 'icon', name: 'info', px: 13 %} {{ 'fit.disclaimer' | t }}</p>
+  </div>
+  <script type="application/json" data-fit-strings>{"alt": {{ 'fit.result_alt' | t: size: '[size]' | json }}}</script>
+</details>

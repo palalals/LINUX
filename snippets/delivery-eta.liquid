@@ -1,0 +1,12 @@
+{%- comment -%}
+  Delivery estimate text. The two theme settings hold the merchant's English
+  strings ("1–2 days"); in Arabic the digits are kept and "days" is localised
+  so the estimate never shows a stray English word inside Arabic UI.
+  Usage: {% render 'delivery-eta', value: settings.delivery_cairo %}
+{%- endcomment -%}
+{%- if request.locale.iso_code == 'ar' -%}
+  {%- assign v = value | replace: 'days', 'أيام' | replace: 'day', 'يوم' | replace: 'hours', 'ساعات' | replace: 'hour', 'ساعة' | replace: 'weeks', 'أسابيع' | replace: 'week', 'أسبوع' -%}
+  {{ v }}
+{%- else -%}
+  {{ value }}
+{%- endif -%}

@@ -1,0 +1,18 @@
+{%- comment -%} Localized option value: 'black' -> 'أسود' in Arabic; sizes always uppercase (xl -> XL); multi-word English values are translated word by word; values that already contain Arabic (translated in Shopify) pass through; unknown English values capitalized. {%- endcomment -%}
+{%- assign k = value | downcase | strip | replace: ' ', '_' -%}
+{%- assign has_ar = false -%}
+{%- assign probe = 'ا,ب,ت,ث,ج,ح,خ,د,ذ,ر,ز,س,ش,ص,ض,ط,ظ,ع,غ,ف,ق,ك,ل,م,ن,ه,و,ي,ى,ة,ء,أ,إ,آ,ؤ,ئ' | split: ',' -%}
+{%- for ch in probe -%}{%- if k contains ch -%}{%- assign has_ar = true -%}{%- break -%}{%- endif -%}{%- endfor -%}
+{%- assign size_keys = 'xs,s,m,l,xl,2xl,xxl,3xl,xxxl,4xl,os,one_size' | split: ',' -%}
+{%- if has_ar or k == blank -%}{{ value }}
+{%- elsif size_keys contains k -%}{{ value | upcase }}
+{%- else -%}
+  {%- assign key = 'products.option_values.' | append: k -%}
+  {%- assign out = key | t -%}
+  {%- assign out_lc = out | downcase -%}
+  {%- if out_lc contains 'translation missing' -%}
+    {%- if request.locale.iso_code == 'ar' and value contains ' ' -%}
+      {%- assign words = value | split: ' ' -%}{%- capture wt -%}{%- for w in words -%}{%- assign wk = 'products.option_values.' | append: w | downcase -%}{%- assign wv = wk | t -%}{%- assign wv_lc = wv | downcase -%}{%- if wv_lc contains 'translation missing' -%}{{ w }}{%- else -%}{{ wv }}{%- endif -%}{%- unless forloop.last %} {% endunless -%}{%- endfor -%}{%- endcapture -%}{{ wt | strip }}
+    {%- else -%}{{ value | capitalize }}{%- endif -%}
+  {%- else -%}{{ out }}{%- endif -%}
+{%- endif -%}

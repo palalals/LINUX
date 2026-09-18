@@ -1,0 +1,40 @@
+{%- comment -%} Colour swatch. Maps common colour names (EN/AR) to CSS colours. {%- endcomment -%}
+{%- liquid
+  assign key = value | downcase | strip
+  assign css = key
+  case key
+    when 'black', 'أسود', 'اسود'
+      assign css = '#111'
+    when 'white', 'أبيض', 'ابيض'
+      assign css = '#f5f5f0'
+    when 'beige', 'بيج', 'cream', 'كريمي'
+      assign css = '#e6d5b8'
+    when 'burgundy', 'برجندي', 'maroon', 'خمري'
+      assign css = '#6b1e2b'
+    when 'green', 'أخضر', 'اخضر', 'forest'
+      assign css = '#0a4a33'
+    when 'olive', 'زيتي'
+      assign css = '#5c6b3a'
+    when 'navy', 'كحلي'
+      assign css = '#1b2a4a'
+    when 'grey', 'gray', 'رصاصي', 'رمادي'
+      assign css = '#8a8a8a'
+    when 'brown', 'بني'
+      assign css = '#5a3e2b'
+    when 'red', 'أحمر', 'احمر'
+      assign css = '#c0392b'
+    when 'blue', 'أزرق', 'ازرق'
+      assign css = '#2b6cb0'
+    when 'pink', 'وردي', 'بينك'
+      assign css = '#e8a0b4'
+    when 'yellow', 'أصفر', 'اصفر'
+      assign css = '#e8c547'
+    when 'orange', 'برتقالي'
+      assign css = '#e07b2a'
+    when 'purple', 'بنفسجي', 'موف'
+      assign css = '#6b4aa3'
+    when 'lime', 'ليموني'
+      assign css = '#8fcb5a'
+  endcase
+-%}
+<span class="swatch{% if small %} swatch--sm{% endif %}{% if active %} is-active{% endif %}" style="--swatch: {{ css }}" title="{{ value | escape }}" aria-label="{{ value | escape }}"></span>

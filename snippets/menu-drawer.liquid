@@ -1,0 +1,57 @@
+{%- liquid
+  assign menu = settings.side_menu
+  if menu.links == blank
+    assign menu_handle = settings.side_menu.handle | default: settings.side_menu
+    assign menu = linklists[menu_handle]
+  endif
+  if menu.links == blank
+    assign menu = linklists['main-menu']
+  endif
+-%}
+<div class="drawer drawer--start glass glass--solid" id="menu-drawer" data-drawer="menu" role="dialog" aria-modal="true" aria-label="{{ 'sections.header.menu' | t }}" aria-hidden="true" inert>
+  <div class="drawer__head">
+    {% render 'brand-logo', height: 20 %}
+    <button class="icon-btn" type="button" data-drawer-close aria-label="{{ 'accessibility.close' | t }}">{% render 'icon', name: 'close' %}</button>
+  </div>
+  <div class="drawer__body">
+    <nav class="menu-drawer__nav" aria-label="{{ 'sections.header.main_menu' | t }}">
+      {%- for link in menu.links -%}
+        {%- if link.links.size > 0 -%}
+          <details class="menu-drawer__group"{% if link.child_active %} open{% endif %}>
+            <summary class="menu-drawer__link">{% render 'menu-title', title: link.title %}{% render 'icon', name: 'chevron-down', px: 18 %}</summary>
+            <div class="menu-drawer__sub">
+              <a href="{% render 'nav-url', url: link.url, title: link.title %}" class="menu-drawer__sublink">{{ 'sections.header.view_all' | t }}</a>
+              {%- for child in link.links -%}
+                <a href="{% render 'nav-url', url: child.url, title: child.title %}" class="menu-drawer__sublink{% if child.active %} is-active{% endif %}">{% render 'menu-title', title: child.title %}</a>
+              {%- endfor -%}
+            </div>
+          </details>
+        {%- else -%}
+          <a href="{% render 'nav-url', url: link.url, title: link.title %}" class="menu-drawer__link{% if link.active %} is-active{% endif %}">{% render 'menu-title', title: link.title %}{% render 'icon', name: 'arrow-up-right', px: 18 %}</a>
+        {%- endif -%}
+      {%- else -%}
+        <a href="{{ routes.all_products_collection_url }}" class="menu-drawer__link">{{ 'nav.shop' | t }}{% render 'icon', name: 'bag', px: 20 %}</a>
+        <a href="{% render 'customize-url' %}" class="menu-drawer__link">{{ 'nav.menu.customize' | t }}{% render 'icon', name: 'customize', px: 20 %}</a>
+        <a href="{{ routes.search_url }}" class="menu-drawer__link">{{ 'nav.search' | t }}{% render 'icon', name: 'search', px: 20 %}</a>
+        {%- if settings.show_wishlist != false -%}
+          <a href="/pages/wishlist" class="menu-drawer__link">{{ 'wishlist.title' | t }}{% render 'icon', name: 'heart', px: 20 %}</a>
+        {%- endif -%}
+      {%- endfor -%}
+    </nav>
+
+    <div class="menu-drawer__mascot" aria-hidden="true">
+      {% render 'mascot', name: 'skate', width: 140, loading: 'lazy' %}
+    </div>
+  </div>
+  <div class="drawer__foot menu-drawer__foot">
+    {%- if settings.show_locale_switcher != false -%}{% render 'locale-switcher', class: 'locale-switcher--block' %}{%- endif -%}
+    {%- if shop.customer_accounts_enabled -%}
+      <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="btn btn--glass btn--sm">{% render 'icon', name: 'account', px: 18 %}{% if customer %}{{ 'customer.account.title' | t }}{% else %}{{ 'customer.login.title' | t }}{% endif %}</a>
+    {%- endif -%}
+    <div class="menu-drawer__social">
+      {%- if settings.social_instagram != blank -%}<a href="{{ settings.social_instagram }}" class="icon-btn" target="_blank" rel="noopener" aria-label="Instagram">{% render 'icon', name: 'instagram' %}</a>{%- endif -%}
+      {%- if settings.social_tiktok != blank -%}<a href="{{ settings.social_tiktok }}" class="icon-btn" target="_blank" rel="noopener" aria-label="TikTok">{% render 'icon', name: 'tiktok' %}</a>{%- endif -%}
+      {%- if settings.social_facebook != blank -%}<a href="{{ settings.social_facebook }}" class="icon-btn" target="_blank" rel="noopener" aria-label="Facebook">{% render 'icon', name: 'facebook' %}</a>{%- endif -%}
+    </div>
+  </div>
+</div>

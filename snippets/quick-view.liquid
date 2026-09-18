@@ -1,0 +1,9 @@
+<div class="modal" id="quick-view" data-modal="quick-view" role="dialog" aria-modal="true" aria-labelledby="quick-view-heading" aria-hidden="true" inert>
+  <div class="modal__panel glass glass--solid" data-quick-view-panel>
+    <div class="quick-view__head">
+      <h2 class="quick-view__heading" id="quick-view-heading">{{ 'products.quick_view' | t }}</h2>
+      <button class="icon-btn glass glass--clear modal__close" type="button" data-modal-close aria-label="{{ 'accessibility.close' | t }}">{% render 'icon', name: 'close' %}</button>
+    </div>
+    <div class="quick-view__content" data-quick-view-content></div>
+  </div>
+</div>

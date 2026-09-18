@@ -1,0 +1,12 @@
+{%- comment -%} iOS-style bottom tab bar, mobile only. {%- endcomment -%}
+<nav class="tab-bar glass glass--solid{% if settings.show_wishlist == false %} tab-bar--4{% endif %}" aria-label="{{ 'accessibility.mobile_nav' | t }}">
+  <a class="tab-bar__item{% if template.name == 'index' %} is-active{% endif %}" href="{{ routes.root_url }}">{% render 'icon', name: 'grid' %}<span>{{ 'nav.home' | t }}</span></a>
+  <a class="tab-bar__item{% if template.name == 'collection' or template.name == 'list-collections' %} is-active{% endif %}" href="{{ routes.all_products_collection_url }}">{% render 'icon', name: 'tag' %}<span>{{ 'nav.shop' | t }}</span></a>
+  <button class="tab-bar__item tab-bar__item--primary" type="button" data-drawer-open="search" aria-label="{{ 'search.title' | t }}">{% render 'icon', name: 'search' %}<span>{{ 'nav.search' | t }}</span></button>
+  {%- if settings.show_wishlist != false -%}<a class="tab-bar__item" href="/pages/wishlist" data-wishlist-link>{% render 'icon', name: 'heart' %}<span>{{ 'nav.saved' | t }}</span><span class="badge" data-wishlist-count hidden>0</span></a>{%- endif -%}
+  {%- if settings.cart_type == 'page' -%}
+    <a class="tab-bar__item" href="{{ routes.cart_url }}">{% render 'icon', name: 'bag' %}<span>{{ 'nav.bag' | t }}</span><span class="badge" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span></a>
+  {%- else -%}
+    <button class="tab-bar__item" type="button" data-drawer-open="cart">{% render 'icon', name: 'bag' %}<span>{{ 'nav.bag' | t }}</span><span class="badge" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span></button>
+  {%- endif -%}
+</nav>

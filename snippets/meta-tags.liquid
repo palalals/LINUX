@@ -1,0 +1,64 @@
+{%- liquid
+  assign og_title = page_title | default: shop.name
+  assign og_url = canonical_url | default: request.origin
+  assign og_type = 'website'
+  assign og_description = page_description | default: shop.description | default: shop.name
+
+  if request.page_type == 'product'
+    assign og_type = 'product'
+    assign og_title = product.title | strip_html
+    assign og_description = product.description | strip_html | truncatewords: 40
+  elsif request.page_type == 'article'
+    assign og_type = 'article'
+    assign og_title = article.title | strip_html
+    assign og_description = article.excerpt_or_content | strip_html | truncatewords: 40
+  elsif request.page_type == 'collection'
+    assign og_title = collection.title | strip_html
+    assign og_description = collection.description | strip_html | truncatewords: 40 | default: og_description
+  endif
+
+  assign og_image = settings.share_image
+  if request.page_type == 'product' and product.featured_image
+    assign og_image = product.featured_image
+  elsif request.page_type == 'article' and article.image
+    assign og_image = article.image
+  elsif request.page_type == 'collection' and collection.image
+    assign og_image = collection.image
+  endif
+-%}
+<meta property="og:site_name" content="{{ shop.name }}">
+<meta property="og:url" content="{{ og_url }}">
+<meta property="og:title" content="{{ og_title | escape }}">
+<meta property="og:type" content="{{ og_type }}">
+<meta property="og:description" content="{{ og_description | escape }}">
+{%- if og_image -%}
+  <meta property="og:image" content="{{ og_image | image_url: width: 1200 }}">
+  <meta property="og:image:secure_url" content="{{ og_image | image_url: width: 1200 }}">
+{%- else -%}
+  <meta property="og:image" content="{{ 'hero-embroidery-poster.webp' | asset_url }}">
+{%- endif -%}
+{%- if request.page_type == 'product' -%}
+  <meta property="og:price:amount" content="{{ product.price | money_without_currency | strip_html }}">
+  <meta property="og:price:currency" content="{{ cart.currency.iso_code | default: shop.currency }}">
+{%- endif -%}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ og_title | escape }}">
+<meta name="twitter:description" content="{{ og_description | escape }}">
+{%- comment -%} Structured data + language alternates so Google indexes AR/EN cleanly {%- endcomment -%}
+{%- if localization.available_languages.size > 1 -%}
+  {%- for lang in localization.available_languages -%}
+    {%- assign lang_root = lang.root_url | default: '/' -%}
+    {%- if lang_root == '/' -%}{%- assign lang_root = '' -%}{%- endif -%}
+    {%- assign alt_path = request.path | remove_first: localization.language.root_url -%}{%- if alt_path == '' -%}{%- assign alt_path = '/' -%}{%- endif -%}
+    <link rel="alternate" hreflang="{{ lang.iso_code }}" href="{{ request.origin }}{{ lang_root }}{{ alt_path }}">
+  {%- endfor -%}
+  {%- assign alt_path = request.path | remove_first: localization.language.root_url -%}{%- if alt_path == '' -%}{%- assign alt_path = '/' -%}{%- endif -%}
+  <link rel="alternate" hreflang="x-default" href="{{ request.origin }}{{ alt_path }}">
+{%- endif -%}
+{%- if request.page_type == 'index' -%}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":{{ shop.name | json }},"url":{{ request.origin | json }},{%- assign ld_logo = 'favicon-180.png' | asset_url -%}{%- unless ld_logo contains "://" -%}{%- assign ld_logo = ld_logo | prepend: "https:" -%}{%- endunless -%}"logo":{{ ld_logo | json }}{% if settings.social_instagram != blank or settings.social_facebook != blank or settings.social_tiktok != blank %},"sameAs":[{% if settings.social_instagram != blank %}{{ settings.social_instagram | json }}{% endif %}{% if settings.social_facebook != blank %}{% if settings.social_instagram != blank %},{% endif %}{{ settings.social_facebook | json }}{% endif %}{% if settings.social_tiktok != blank %}{% if settings.social_instagram != blank or settings.social_facebook != blank %},{% endif %}{{ settings.social_tiktok | json }}{% endif %}]{% endif %}}</script>
+{%- assign search_target = request.origin | append: routes.search_url | append: '?q=' -%}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":{{ shop.name | json }},"url":{{ request.origin | json }},"potentialAction":{"@type":"SearchAction","target":"{{ search_target }}{search_term_string}","query-input":"required name=search_term_string"}}</script>
+{%- elsif request.page_type == 'product' -%}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":{{ product.title | json }},"url":{{ request.origin | append: product.url | json }},{%- assign ld_img = product.featured_image | image_url: width: 1200 -%}{%- unless ld_img contains "://" -%}{%- assign ld_img = ld_img | prepend: "https:" -%}{%- endunless -%}"image":{{ ld_img | json }},"description":{{ product.description | strip_html | truncatewords: 60 | json }},"brand":{"@type":"Brand","name":{{ product.vendor | json }}},"offers":{"@type":"AggregateOffer","priceCurrency":{{ cart.currency.iso_code | default: shop.currency | json }},"lowPrice":{{ product.price_min | divided_by: 100.0 }},"highPrice":{{ product.price_max | divided_by: 100.0 }},"availability":"https://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}","url":{{ request.origin | append: product.url | json }}}}</script>
+{%- endif -%}

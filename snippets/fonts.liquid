@@ -1,0 +1,23 @@
+{%- comment -%}
+  Self-hosted fonts.
+    EN  headings: Froople (single cut)
+        body/UI:  Mochi Tubby (single cut)
+    AR  headings: Thmanyah Sans Black
+        body/UI:  Thmanyah Sans Regular / Medium
+    numbers / prices: JetBrains Mono fallback for tabular spacing
+{%- endcomment -%}
+{%- if is_rtl -%}
+  {{ 'thmanyahsans-Black.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+  {{ 'thmanyahsans-Regular.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+{%- else -%}
+  {{ 'froople.otf' | asset_url | preload_tag: as: 'font', type: 'font/opentype', crossorigin: 'anonymous' }}
+  {{ 'mochi-tubby.ttf' | asset_url | preload_tag: as: 'font', type: 'font/ttf', crossorigin: 'anonymous' }}
+{%- endif -%}
+<style>
+  @font-face { font-family: "Froople"; font-style: normal; font-weight: 400 900; font-display: swap; src: url("{{ 'froople.otf' | asset_url }}") format("opentype"); }
+  @font-face { font-family: "Mochi Tubby"; font-style: normal; font-weight: 300 900; font-display: swap; src: url("{{ 'mochi-tubby.ttf' | asset_url }}") format("truetype"); }
+  @font-face { font-family: "Thmanyah Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("{{ 'thmanyahsans-Regular.woff2' | asset_url }}") format("woff2"); }
+  @font-face { font-family: "Thmanyah Sans"; font-style: normal; font-weight: 500; font-display: swap; src: url("{{ 'thmanyahsans-Medium.woff2' | asset_url }}") format("woff2"); }
+  @font-face { font-family: "Thmanyah Sans"; font-style: normal; font-weight: 800 900; font-display: swap; src: url("{{ 'thmanyahsans-Black.woff2' | asset_url }}") format("woff2"); }
+  @font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400 700; font-display: swap; src: url("{{ 'jetbrains-mono-latin.woff2' | asset_url }}") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+20AC, U+2212, U+FEFF, U+FFFD; }
+</style>

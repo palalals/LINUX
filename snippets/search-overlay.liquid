@@ -1,0 +1,22 @@
+<div class="search-overlay" id="search-overlay" data-drawer="search" role="dialog" aria-modal="true" aria-label="{{ 'search.title' | t }}" aria-hidden="true" inert>
+  <div class="search-overlay__panel glass glass--solid" data-search>
+    <form class="search-overlay__bar glass glass--pill" action="{{ routes.search_url }}" method="get" role="search">
+      {% render 'icon', name: 'search' %}
+      <input class="input" id="search-input" type="search" name="q" placeholder="{{ 'search.placeholder' | t }}" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="{{ 'search.title' | t }}" data-search-input>
+      <input type="hidden" name="options[prefix]" value="last">
+      <button class="icon-btn" type="button" data-drawer-close aria-label="{{ 'accessibility.close' | t }}">{% render 'icon', name: 'close' %}</button>
+    </form>
+    <div class="search-overlay__results" data-search-results aria-live="polite">
+      <div class="search-suggestions">
+        <span class="search-group__title" style="width:100%">{{ 'search.popular' | t }}</span>
+        {%- comment -%} Chips show the localized label; the search itself runs on the catalog (English) term. {%- endcomment -%}
+        {%- assign suggestions = settings.search_suggestions | default: 'Hoodie,Anime,Customize,Sada,Shirt' | split: ',' -%}
+        {%- assign labels = 'search.popular_terms' | t | split: ',' -%}
+        {%- for term in suggestions -%}
+          {%- assign label = labels[forloop.index0] | default: term -%}
+          <button class="chip" type="button" data-search-suggest="{{ term | strip }}">{{ label | strip }}</button>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</div>
